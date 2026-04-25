@@ -138,6 +138,19 @@
       border-radius: 18px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.03);
       border: 1px solid #e2edf7;
+      /* ομαλή μετάβαση για το highlight */
+      transition: background 0.2s, border-color 0.2s;
+    }
+    /* Προειδοποίηση διπλότυπου: κόκκινη αριστερή μπάρα */
+    .product.duplicate-warning {
+      border-left: 5px solid #e53e3e;
+      padding-left: 5px;
+    }
+    /* Ισχυρή προειδοποίηση: αν υπάρχει ποσότητα και αλλού */
+    .product.duplicate-quantity-alert {
+      background: #fff5f5;
+      border-color: #fc8181;
+      border-left: 5px solid #c53030;
     }
     .product-header { display: flex; align-items: center; gap: 4px; margin-bottom: 8px; }
     .drag-handle {
@@ -156,6 +169,12 @@
       flex: 1;
       word-break: break-word;
       line-height: 1.2;
+    }
+    .duplicate-icon {
+      font-size: 16px;
+      margin-left: 4px;
+      cursor: help;
+      color: #e53e3e;
     }
     .product-actions { display: flex; gap: 2px; flex-shrink: 0; }
     .edit-product-btn, .delete-btn {
@@ -390,7 +409,16 @@
 
 <!-- Modals -->
 <div id="unitModal" class="modal" style="display: none;" onclick="closeModal(event)"><div class="modal-content" onclick="event.stopPropagation()"><h3>Επιλογή μονάδας</h3><div class="unit-option" data-unit="pieces">📦 Τεμάχια</div><div class="unit-option" data-unit="kg">⚖️ Κιλά</div><div class="unit-option" data-unit="pallet">🏗️ Παλέτα</div></div></div>
-<div id="addProductModal" class="modal" style="display: none;" onclick="closeAddModal(event)"><div class="modal-content" onclick="event.stopPropagation()"><h3>➕ Νέο προϊόν</h3><input type="text" id="newProductName" placeholder="Όνομα προϊόντος" autocomplete="off"><button onclick="addNewProduct()">Προσθήκη</button></div></div>
+
+<div id="addProductModal" class="modal" style="display: none;" onclick="closeAddModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <h3>➕ Νέο προϊόν</h3>
+    <input type="text" id="newProductName" placeholder="Όνομα προϊόντος" autocomplete="off">
+    <div id="duplicateWarning" style="color: red; font-size: 12px; margin-top: 4px; min-height: 18px;"></div>
+    <button onclick="addNewProduct()">Προσθήκη</button>
+  </div>
+</div>
+
 <div id="editProductModal" class="modal" style="display: none;" onclick="closeEditModal(event)"><div class="modal-content" onclick="event.stopPropagation()"><h3>✏️ Επεξεργασία προϊόντος</h3><input type="text" id="editProductNameInput" placeholder="Νέο όνομα"><button onclick="saveEditedProduct()">Αποθήκευση</button></div></div>
 <div id="deletedModal" class="modal" style="display: none;" onclick="closeDeletedModal(event)"><div class="modal-content" onclick="event.stopPropagation()"><h3>🗑️ Διεγραμμένα προϊόντα</h3><div id="deletedListContainer"></div><button onclick="closeDeletedModal()">Κλείσιμο</button></div></div>
 <div id="categoryManagerModal" class="modal" style="display: none;" onclick="closeCategoryManager(event)"><div class="modal-content" onclick="event.stopPropagation()"><h3>📂 Διαχείριση κατηγοριών</h3><div id="categoryListContainer"></div><div style="display: flex; gap: 6px; margin-top: 10px;"><input type="text" id="newCategoryName" placeholder="Όνομα νέας κατηγορίας" style="flex:2;"><button onclick="addNewCategory()" style="flex:1;">➕</button></div><button onclick="closeCategoryManager()" style="margin-top: 12px;">Κλείσιμο</button></div></div>
@@ -460,6 +488,49 @@
   if (categories.length === 0) initializeCategories();
   activeCategoryId = categories[0]?.id || null;
 
+  // --- Υπολογισμός διπλότυπων (global) ---
+  function getDuplicateMap() {
+    const map = new Map(); // name -> [{catId, catName, product}]
+    categories.forEach(cat => {
+      cat.products.forEach(p => {
+        const key = p.name.toLowerCase();
+        if (!map.has(key)) map.set(key, []);
+        map.get(key).push({ catId: cat.id, catName: cat.name, product: p });
+      });
+    });
+    // Κρατάμε μόνο αυτά που εμφανίζονται σε >1 κατηγορίες
+    const duplicates = new Map();
+    for (let [key, entries] of map.entries()) {
+      if (entries.length > 1) duplicates.set(key, entries);
+    }
+    return duplicates;
+  }
+
+  // --- Έλεγχος διπλότυπων κατά την πληκτρολόγηση στο modal (νέο προϊόν) ---
+  document.getElementById('newProductName').addEventListener('input', function(e) {
+    const name = e.target.value.trim().toLowerCase();
+    const warningEl = document.getElementById('duplicateWarning');
+    if (!name) {
+      e.target.style.borderColor = '';
+      e.target.style.backgroundColor = '';
+      warningEl.textContent = '';
+      return;
+    }
+    const duplicateCat = categories.find(cat =>
+      cat.id !== activeCategoryId &&
+      cat.products.some(p => p.name.toLowerCase() === name)
+    );
+    if (duplicateCat) {
+      e.target.style.borderColor = 'red';
+      e.target.style.backgroundColor = '#fff0f0';
+      warningEl.textContent = '⚠️ Υπάρχει ήδη στην κατηγορία: ' + duplicateCat.name;
+    } else {
+      e.target.style.borderColor = '';
+      e.target.style.backgroundColor = '';
+      warningEl.textContent = '';
+    }
+  });
+
   // --- UI Rendering ---
   function renderTabs() {
     const container = document.getElementById('tabsContainer');
@@ -503,6 +574,9 @@
       return;
     }
 
+    // Χάρτης διπλότυπων για όλη την εφαρμογή
+    const duplicateMap = getDuplicateMap();
+
     let html = '';
     filtered.forEach((p) => {
       const originalIndex = cat.products.findIndex(prod => prod.name === p.name);
@@ -513,11 +587,37 @@
       const dragHandle = term ? '' : `<span class="drag-handle" title="Σύρε για ταξινόμηση">☰</span>`;
       const inputMode = (p.secondUnit === 'kg') ? 'decimal' : 'numeric';
 
+      // Έλεγχος διπλότυπου
+      const key = p.name.toLowerCase();
+      const duplicateEntries = duplicateMap.get(key);
+      let isDuplicate = false;
+      let otherCategoryNames = [];
+      let hasQuantityAlert = false;
+
+      if (duplicateEntries) {
+        // Υπάρχει σε τουλάχιστον μία άλλη κατηγορία εκτός της τρέχουσας
+        const otherEntries = duplicateEntries.filter(e => e.catId !== cat.id);
+        if (otherEntries.length > 0) {
+          isDuplicate = true;
+          otherCategoryNames = otherEntries.map(e => e.catName);
+          // Ελέγχουμε αν το τρέχον προϊόν έχει ποσότητα >0 και κάποιο άλλο επίσης
+          const currentHasQty = (p.boxes > 0 || p.secondValue > 0);
+          const anyOtherHasQty = otherEntries.some(e => e.product.boxes > 0 || e.product.secondValue > 0);
+          if (currentHasQty && anyOtherHasQty) {
+            hasQuantityAlert = true;
+          }
+        }
+      }
+
+      const duplicateClass = isDuplicate ? 'duplicate-warning' : '';
+      const quantityAlertClass = hasQuantityAlert ? 'duplicate-quantity-alert' : '';
+      const iconHtml = isDuplicate ? `<span class="duplicate-icon" title="Υπάρχει και στις: ${otherCategoryNames.join(', ')}">⚠️</span>` : '';
+
       html += `
-        <div class="product" data-index="${originalIndex}">
+        <div class="product ${duplicateClass} ${quantityAlertClass}" data-index="${originalIndex}">
           <div class="product-header">
             ${dragHandle}
-            <div class="product-name">${escapeHtml(p.name)}</div>
+            <div class="product-name">${escapeHtml(p.name)}${iconHtml}</div>
             <div class="product-actions">
               <button class="edit-product-btn" onclick="openEditProductModal('${cat.id}', ${originalIndex})" title="Επεξεργασία">✏️</button>
               <button class="delete-btn" onclick="deleteProduct('${cat.id}', ${originalIndex})" title="Διαγραφή">🗑️</button>
@@ -614,8 +714,12 @@
     refreshUI();
   };
   window.openAddProductModal = () => {
+    const input = document.getElementById('newProductName');
+    input.value = '';
+    input.style.borderColor = '';
+    input.style.backgroundColor = '';
+    document.getElementById('duplicateWarning').textContent = '';
     document.getElementById('addProductModal').style.display = 'flex';
-    document.getElementById('newProductName').value = '';
   };
   window.closeAddModal = (e) => { if (!e || e.target.id === 'addProductModal') document.getElementById('addProductModal').style.display = 'none'; };
   window.addNewProduct = () => {
@@ -626,6 +730,7 @@
     if (cat.products.some(p => p.name.toLowerCase() === name.toLowerCase())) { alert('Υπάρχει ήδη'); return; }
     cat.products.push({ name, boxes:0, secondValue:0, secondUnit:'pieces' });
     input.value = '';
+    document.getElementById('duplicateWarning').textContent = '';
     document.getElementById('addProductModal').style.display = 'none';
     saveToStorage();
     refreshUI();
