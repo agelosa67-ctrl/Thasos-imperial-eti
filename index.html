@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <title>THASSOS IMPERIAL · Αποθήκη (Mobile Compact)</title>
-  <!-- SortableJS -->
+  <title>THASSOS IMPERIAL · Αποθήκη</title>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; }
@@ -15,32 +14,24 @@
       padding: 0;
       -webkit-tap-highlight-color: transparent;
     }
-
-    /* ---------- ΣΤΑΘΕΡΕΣ ΚΕΦΑΛΙΔΕΣ ---------- */
     header {
       background: #1e3a5f;
       color: white;
-      padding: 10px 12px;        /* λίγο πιο compact */
+      padding: 10px 12px;
       text-align: center;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       position: sticky;
       top: 0;
       z-index: 20;
     }
-    header h1 {
-      margin: 0;
-      font-size: 1.2rem;         /* ελαφρώς μικρότερο */
-      letter-spacing: 0.5px;
-      font-weight: 600;
-    }
-
+    header h1 { margin: 0; font-size: 1.2rem; letter-spacing: 0.5px; font-weight: 600; }
     .tabs-container {
       display: flex;
       align-items: center;
       background: white;
       border-bottom: 2px solid #1e3a5f;
       position: sticky;
-      top: 48px;                 /* ταίριαξε με το νέο header ύψος */
+      top: 48px;
       z-index: 19;
     }
     .tabs {
@@ -52,7 +43,7 @@
     }
     .tab {
       flex: 1 0 auto;
-      padding: 10px 14px;        /* πιο μαζεμένο */
+      padding: 10px 14px;
       text-align: center;
       font-weight: 600;
       color: #1e3a5f;
@@ -65,10 +56,7 @@
       touch-action: manipulation;
     }
     .tab:last-child { border-right: none; }
-    .tab.active {
-      background: #1e3a5f;
-      color: white;
-    }
+    .tab.active { background: #1e3a5f; color: white; }
     .manage-cats-btn, .search-toggle-btn {
       background: white;
       border: none;
@@ -83,17 +71,13 @@
       justify-content: center;
       touch-action: manipulation;
     }
-    .search-toggle-btn {
-      border-left: none;
-    }
-
-    /* ---------- SEARCH SECTION ---------- */
+    .search-toggle-btn { border-left: none; }
     .search-section {
       background: white;
       padding: 8px 12px 10px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
       position: sticky;
-      top: 96px;                 /* header + tabs (48+48 περίπου) */
+      top: 96px;
       z-index: 18;
       transition: transform 0.3s ease, box-shadow 0.3s, opacity 0.2s;
       will-change: transform;
@@ -104,7 +88,6 @@
       opacity: 0;
       pointer-events: none;
     }
-
     input#search {
       width: 100%;
       padding: 10px 14px;
@@ -114,11 +97,7 @@
       outline: none;
       background: #fafcff;
     }
-    input#search:focus {
-      border-color: #1e3a5f;
-      background: white;
-    }
-
+    input#search:focus { border-color: #1e3a5f; background: white; }
     .action-bar {
       display: flex;
       gap: 6px;
@@ -144,45 +123,25 @@
     .action-bar button.export-top-btn { background: #0b3b5c; }
     .action-bar button.clear-all-btn { background: #b91c1c; }
     .action-bar button.deleted-btn { background: #6b4f3c; }
-
     @media (max-width: 360px) {
-      .action-bar button {
-        font-size: 10px;
-        padding: 7px 0;
-      }
-      .tab {
-        padding: 9px 10px;
-        font-size: 12px;
-      }
+      .action-bar button { font-size: 10px; padding: 7px 0; }
+      .tab { padding: 9px 10px; font-size: 12px; }
     }
-
-    /* ---------- ΠΕΡΙΕΧΟΜΕΝΟ (COMPACT) ---------- */
-    .tab-content {
-      padding: 8px 10px 16px;
-    }
+    .tab-content { padding: 8px 10px 16px; }
     .tab-pane { display: none; }
     .tab-pane.active { display: block; }
-
     .product-list { padding: 2px 0; }
-
     .product {
       background: white;
-      margin: 8px 0;            /* μικρότερο κενό ανάμεσα στα προϊόντα */
-      padding: 10px 10px;       /* συμπαγές εσωτερικό */
+      margin: 8px 0;
+      padding: 10px 10px;
       border-radius: 18px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.03);
       border: 1px solid #e2edf7;
     }
-
-    .product-header {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      margin-bottom: 8px;       /* λιγότερο κενό πριν τα κουμπιά */
-    }
-
+    .product-header { display: flex; align-items: center; gap: 4px; margin-bottom: 8px; }
     .drag-handle {
-      font-size: 24px;          /* λίγο μικρότερο αλλά ακόμα ευδιάκριτο */
+      font-size: 24px;
       color: #6b8aaf;
       cursor: grab;
       user-select: none;
@@ -190,22 +149,15 @@
       padding: 6px 8px 6px 0;
     }
     .drag-handle:active { cursor: grabbing; }
-
     .product-name {
       font-weight: 700;
-      font-size: 14px;          /* συμπαγές μέγεθος */
+      font-size: 14px;
       color: #0f2a44;
       flex: 1;
       word-break: break-word;
       line-height: 1.2;
     }
-
-    .product-actions {
-      display: flex;
-      gap: 2px;
-      flex-shrink: 0;
-    }
-
+    .product-actions { display: flex; gap: 2px; flex-shrink: 0; }
     .edit-product-btn, .delete-btn {
       background: none;
       border: none;
@@ -221,20 +173,8 @@
       justify-content: center;
       touch-action: manipulation;
     }
-
-    .product-controls {
-      display: flex;
-      gap: 10px;               /* μειωμένο κενό ανάμεσα στις δύο στήλες */
-      justify-content: space-around;
-    }
-
-    .qty-item {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
+    .product-controls { display: flex; gap: 10px; justify-content: space-around; }
+    .qty-item { flex: 1; display: flex; flex-direction: column; align-items: center; }
     .qty-label {
       display: flex;
       align-items: center;
@@ -247,7 +187,6 @@
       cursor: pointer;
     }
     .qty-label span { border-bottom: 1px dashed #1e3a5f; }
-
     .qty-control {
       display: flex;
       align-items: center;
@@ -260,7 +199,7 @@
       justify-content: center;
     }
     .qty-control button {
-      width: 40px;              /* μικρότερο αλλά >44px αφής δεν είναι απαραίτητο? 40 είναι άνετο */
+      width: 40px;
       height: 40px;
       border-radius: 50%;
       border: none;
@@ -288,12 +227,7 @@
       -moz-appearance: textfield;
     }
     .qty-control input::-webkit-outer-spin-button,
-    .qty-control input::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-
-    /* ---------- SCROLL TO TOP ---------- */
+    .qty-control input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     #scrollToTopBtn {
       position: fixed;
       bottom: 16px;
@@ -317,12 +251,7 @@
       pointer-events: none;
       touch-action: manipulation;
     }
-    #scrollToTopBtn.visible {
-      opacity: 1;
-      transform: scale(1);
-      pointer-events: auto;
-    }
-
+    #scrollToTopBtn.visible { opacity: 1; transform: scale(1); pointer-events: auto; }
     .no-results {
       text-align: center;
       padding: 25px;
@@ -332,14 +261,7 @@
       border-radius: 20px;
       margin-top: 16px;
     }
-    .footer-note {
-      text-align: center;
-      font-size: 11px;
-      color: #6f8fae;
-      padding: 12px;
-    }
-
-    /* Modals (ελαφρώς πιο compact) */
+    .footer-note { text-align: center; font-size: 11px; color: #6f8fae; padding: 12px; }
     .modal {
       position: fixed;
       top: 0; left: 0;
@@ -360,13 +282,7 @@
       overflow-y: auto;
       box-shadow: 0 20px 35px rgba(0,0,0,0.2);
     }
-    .modal-content h3 {
-      margin: 0 0 16px;
-      color: #1e3a5f;
-      text-align: center;
-      font-weight: 700;
-      font-size: 18px;
-    }
+    .modal-content h3 { margin: 0 0 16px; color: #1e3a5f; text-align: center; font-weight: 700; font-size: 18px; }
     .modal-content input {
       padding: 12px 14px;
       margin: 6px 0;
@@ -401,7 +317,6 @@
       touch-action: manipulation;
     }
     .unit-option:hover { background: #1e3a5f; color: white; }
-
     .deleted-item {
       background: #fef9ec;
       margin: 6px 0;
@@ -425,7 +340,6 @@
     }
     .restore-btn { background: #15803d; }
     .perm-delete-btn { background: #b91c1c; margin-left: 4px; }
-
     .category-item {
       display: flex;
       align-items: center;
@@ -435,11 +349,7 @@
       border-radius: 14px;
       margin-bottom: 6px;
     }
-    .category-name {
-      font-weight: 600;
-      color: #1e3a5f;
-      font-size: 15px;
-    }
+    .category-name { font-weight: 600; color: #1e3a5f; font-size: 15px; }
     .category-actions button {
       background: none;
       border: none;
@@ -453,12 +363,9 @@
 </head>
 <body>
 
-<!-- ΚΟΥΜΠΙ SCROLL TO TOP -->
 <button id="scrollToTopBtn" title="Πάνω">⬆️</button>
 
-<header>
-  <h1>THASSOS IMPERIAL</h1>
-</header>
+<header><h1>THASSOS IMPERIAL</h1></header>
 
 <div class="tabs-container">
   <div class="tabs" id="tabsContainer"></div>
@@ -481,76 +388,28 @@
 
 <div class="footer-note">THASSOS IMPERIAL · Δυναμική διαχείριση αποθήκης</div>
 
-<!-- Modal επιλογής μονάδας -->
-<div id="unitModal" class="modal" style="display: none;" onclick="closeModal(event)">
-  <div class="modal-content" onclick="event.stopPropagation()">
-    <h3>Επιλογή μονάδας</h3>
-    <div class="unit-option" data-unit="pieces">📦 Τεμάχια</div>
-    <div class="unit-option" data-unit="kg">⚖️ Κιλά</div>
-    <div class="unit-option" data-unit="pallet">🏗️ Παλέτα</div>
-  </div>
-</div>
-
-<!-- Modal προσθήκης νέου προϊόντος -->
-<div id="addProductModal" class="modal" style="display: none;" onclick="closeAddModal(event)">
-  <div class="modal-content" onclick="event.stopPropagation()">
-    <h3>➕ Νέο προϊόν</h3>
-    <input type="text" id="newProductName" placeholder="Όνομα προϊόντος" autocomplete="off">
-    <button onclick="addNewProduct()">Προσθήκη</button>
-  </div>
-</div>
-
-<!-- Modal επεξεργασίας προϊόντος -->
-<div id="editProductModal" class="modal" style="display: none;" onclick="closeEditModal(event)">
-  <div class="modal-content" onclick="event.stopPropagation()">
-    <h3>✏️ Επεξεργασία προϊόντος</h3>
-    <input type="text" id="editProductNameInput" placeholder="Νέο όνομα">
-    <button onclick="saveEditedProduct()">Αποθήκευση</button>
-  </div>
-</div>
-
-<!-- Modal διεγραμμένων -->
-<div id="deletedModal" class="modal" style="display: none;" onclick="closeDeletedModal(event)">
-  <div class="modal-content" onclick="event.stopPropagation()">
-    <h3>🗑️ Διεγραμμένα προϊόντα</h3>
-    <div id="deletedListContainer"></div>
-    <button onclick="closeDeletedModal()">Κλείσιμο</button>
-  </div>
-</div>
-
-<!-- Modal διαχείρισης κατηγοριών -->
-<div id="categoryManagerModal" class="modal" style="display: none;" onclick="closeCategoryManager(event)">
-  <div class="modal-content" onclick="event.stopPropagation()">
-    <h3>📂 Διαχείριση κατηγοριών</h3>
-    <div id="categoryListContainer"></div>
-    <div style="display: flex; gap: 6px; margin-top: 10px;">
-      <input type="text" id="newCategoryName" placeholder="Όνομα νέας κατηγορίας" style="flex:2;">
-      <button onclick="addNewCategory()" style="flex:1;">➕</button>
-    </div>
-    <button onclick="closeCategoryManager()" style="margin-top: 12px;">Κλείσιμο</button>
-  </div>
-</div>
+<!-- Modals -->
+<div id="unitModal" class="modal" style="display: none;" onclick="closeModal(event)"><div class="modal-content" onclick="event.stopPropagation()"><h3>Επιλογή μονάδας</h3><div class="unit-option" data-unit="pieces">📦 Τεμάχια</div><div class="unit-option" data-unit="kg">⚖️ Κιλά</div><div class="unit-option" data-unit="pallet">🏗️ Παλέτα</div></div></div>
+<div id="addProductModal" class="modal" style="display: none;" onclick="closeAddModal(event)"><div class="modal-content" onclick="event.stopPropagation()"><h3>➕ Νέο προϊόν</h3><input type="text" id="newProductName" placeholder="Όνομα προϊόντος" autocomplete="off"><button onclick="addNewProduct()">Προσθήκη</button></div></div>
+<div id="editProductModal" class="modal" style="display: none;" onclick="closeEditModal(event)"><div class="modal-content" onclick="event.stopPropagation()"><h3>✏️ Επεξεργασία προϊόντος</h3><input type="text" id="editProductNameInput" placeholder="Νέο όνομα"><button onclick="saveEditedProduct()">Αποθήκευση</button></div></div>
+<div id="deletedModal" class="modal" style="display: none;" onclick="closeDeletedModal(event)"><div class="modal-content" onclick="event.stopPropagation()"><h3>🗑️ Διεγραμμένα προϊόντα</h3><div id="deletedListContainer"></div><button onclick="closeDeletedModal()">Κλείσιμο</button></div></div>
+<div id="categoryManagerModal" class="modal" style="display: none;" onclick="closeCategoryManager(event)"><div class="modal-content" onclick="event.stopPropagation()"><h3>📂 Διαχείριση κατηγοριών</h3><div id="categoryListContainer"></div><div style="display: flex; gap: 6px; margin-top: 10px;"><input type="text" id="newCategoryName" placeholder="Όνομα νέας κατηγορίας" style="flex:2;"><button onclick="addNewCategory()" style="flex:1;">➕</button></div><button onclick="closeCategoryManager()" style="margin-top: 12px;">Κλείσιμο</button></div></div>
 
 <script>
   "use strict";
 
-  // ---------- Βοηθητικές ----------
-  function escapeHtml(str) {
-    return str.replace(/[&<>]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;' })[m]);
-  }
+  function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;' })[m]); }
 
-  // ---------- Δομή δεδομένων ----------
   let categories = [];
   let activeCategoryId = null;
   let sortableInstances = {};
   let pendingUnitChange = null;
   let pendingEditProduct = null;
-
-  const STORAGE_KEY = 'thasos_inventory_v2';
+  const STORAGE_KEY = 'thasos_inventory_v3';
 
   const defaultCategories = [
     { name: 'Ιορδάνου', products: [
-        "Κουτί πίτσας","Ξυλάκι γκολφ 12εκ","Σκαφάκια craft","Bowl στρογγυλό","Καπάκια για bowl στρογγυλό","Bowl τετράγωνο","Καπάκια για bowl τετράγωνο","Λαδόκολλα καφέ 20χ30","Ρολό wypall κανάτα","Wrapmaster μεμβράνη 30cm x 300m","Wrapmaster μεμβράνη 45cm x 300m","Σακούλες για πάγο","Σακούλες κόκκινες","Σακούλες μπλε","Ρολό χάρτη 2χ4,5 kg","Τραπεζομάντηλα","Χαρτοπετσέτες","Ρολό βετεξ μπλε","Ρολό βετεξ κίτρινο","Σύρμα σπιράλ","Σφουγγάρια μεγάλα 14χ9","Σφουγγάρι 10χ7χ3","Μάπα *σφουγγαρίστρα μεγάλη","Solid hero 4,5kg","Kichen pro duo 2L καθαριστικό για κουζίνα","Clear dry hdp plus 5 L","Regain 5L","Χλωρίνη παχύρρευστη 5L","Assert fresh so 5L","Assert fresh so 20kg","Toprinse hd so στεγνωτικό πλυντήριο πιάτων 20kg","Topmatic crystal so απορρυπαντικό για πλυντήριο 25kg","Αεροζόλ για μηχανήματα","Imi orange γενική καθαριστικό κουζίνας","Kichen pro des special 2L απολυμαντικό επιφάνειας","Greaselift 2L","D-rinse plus στεγνωτικό πλυντήριο 5L","Drop extra απορρυπαντικό πλυντηρίου 5L","Γάντια μαύρα S","Γάντια μαύρα M","Γάντια μαύρα L","Γάντια μαύρα Xl","Γάντια με πούδρα Xl","Γάντια κόκκινα Μ","Γάντια κόκκινα L","Ποτήρι πλαστικό","Καπάκια για ποτήρι πλαστικό","Χάρτινο ποτήρι μεγάλο","Καπάκια για χάρτινο ποτήρι μεγάλο","Χάρτινο ποτήρι μεσαίο","Καπάκι για χάρτινο ποτήρι μεσαίο","Χάρτινο ποτήρι μικρό","Καπάκι για χάρτινο ποτήρι μικρό","Καλαμάκια χοντρά","Καλαμάκια για φραπέ","Καλαμάκια για φρέντο","Αναδευτήρες","Ξυλάκι φιόγκος 12cm","Μαχαιροπήρουνα","Κουταλάκια για παγωτό","Ταμπλέτες multi κουβάς","Σοκ κουβάς","Λαδόκολλα μεγάλη","Σκεύη για γιαούρτι"
+        "Κουτί πίτσας","Ξυλάκι γκολφ 12εκ","Σκαφάκια craft","Bowl στρογγυλό","Καπάκια για bowl στρογγυλό","Bowl τετράγωνο","Καπάκια για bowl τετράγωνο","Λαδόκολλα καφέ 20χ30","Ρολό wypall κανάτα","Wrapmaster μεμβράνη 30cm x 300m","Wrapmaster μεμβράνη 45cm x 300m","Σακούλες για πάγο","Σακούλες κόκκινες","Σακούλες μπλε","Ρολό χάρτη 2χ4,5 kg","Τραπεζομάντηλα","Χαρτοπετσέτες","Ρολό βετεξ μπλε","Ρολό βετεξ κίτρινο","Σύρμα σπιράλ","Σφουγγάρια μεγάλα 14χ9","Σφουγγάρι 10χ7χ3","Μάπα *σφουγγαρίστρα μεγάλη","Solid hero 4,5kg","Kichen pro duo 2L καθαριστικό για κουζίνα","Clear dry hdp plus 5 L","Regain 5L","Χλωρίνη παχύρρευστη 5L","Assert fresh so 5L απορρυπαντικό για πλύσιμο πιάτων στο χέρι","Assert fresh so 20kg απορρυπαντικό για πλύσιμο πιάτων στο χέρι","Toprinse hd so στεγνωτικό πλυντήριο πιάτων 20kg","Topmatic crystal so απορρυπαντικό για πλυντήριο 25kg","Αεροζόλ για μηχανήματα","Imi orange γενική καθαριστικό κουζίνας","Kichen pro des special 2L απολυμαντικό επιφάνειας","Greaselift 2L","D-rinse plus στεγνωτικό πλυντήριο 5L","Drop extra απορρυπαντικό πλυντηρίου 5L","Γάντια μαύρα S","Γάντια μαύρα M","Γάντια μαύρα L","Γάντια μαύρα Xl","Γάντια με πούδρα Xl","Γάντια κόκκινα Μ","Γάντια κόκκινα L","Ποτήρι πλαστικό","Καπάκια για ποτήρι πλαστικό","Χάρτινο ποτήρι μεγάλο","Καπάκια για χάρτινο ποτήρι μεγάλο","Χάρτινο ποτήρι μεσαίο","Καπάκι για χάρτινο ποτήρι μεσαίο","Χάρτινο ποτήρι μικρό","Καπάκι για χάρτινο ποτήρι μικρό","Καλαμάκια χοντρά","Καλαμάκια για φραπέ","Καλαμάκια για φρέντο","Αναδευτήρες","Ξυλάκι φιόγκος 12cm","Μαχαιροπήρουνα","Κουταλάκια για παγωτό","Ταμπλέτες multi κουβάς","Σοκ κουβάς","Λαδόκολλα μεγάλη","Σκεύη για γιαούρτι"
       ].map(n => ({ name: n, boxes:0, secondValue:0, secondUnit:'pieces' }))
     },
     { name: 'Bikre ταβέρνα', products: [
@@ -562,8 +421,17 @@
       ].map(n => ({ name:n, boxes:0, secondValue:0, secondUnit:'pieces' }))
     },
     { name: 'Thasosfood ξενοδοχείο ξηρά', products: [
-        "Ξύδι 390ml","Λεμόνι 370ml","Ξύδι 5L","Καστανή ζάχαρη 1kg","Λευκή ζάχαρη 1kg","Ζάχαρη καστανή στικ","Ζάχαρη λευκή στικ","Οδοντογλυφίδες","Στέβια στικ","Μέλι στικ","Μέλι μερίδα","Μερέντα μερίδα","Μαρμελάδα ροδάκινο μερίδα","Μαρμελάδα βερίκοκο","Μαρμελάδα φράουλα μερίδα","Μουστάρδα 4,2kg","Κέτσαπ 4,1kg","Κευσαπ στικ","Μαγιονέζα στικ","Μουστάρδα στικ","Πούλπα τομάτας 4100g","Τοματοπολτός 4500g","Κονκασέ 2500g","Πιπεριά κόκκινη ψητή 4100g","Κρεμμυδάκια Στιφάδο 2000g","Ντολμαδάκια 2000g","Φασολάκια γίγας 2000g","Κόκκινα φασόλια 2500g","Φασόλια μαγειρεμένα 2620g","Μανιτάρια τεμαχισμένα 2450g","Μανιτάρια ολόκληρα 2500g","Κομπόστα Φρουτοσαλάτα 2550g","Κομπόστα αχλάδια μισοκομμένα 1500g","Κομπόστα ροδέλες ανανά 3000g","Κομπόστα ροδάκινα σε φέτες 2600g","Μακαρόνια πέννες ριγέ","Μακαρόνια τριβελάκι χρώμα","Μακαρόνια τριβελάκι","Μακαρόνια φιογκάκια","Μακαρόνια κοφτό","Μακαρόνια παστίτσιο","Σπαγγέτι no6","Μακαρόνια Λαζανάκι","Κους κους","Κριθαράκι μέτριο","Knorr Σάλτσα Demi glace 1,2kg","Knorr Σούπα τομάτα κρέμα 1kg","Knorr ζωμός κότας σε πάστα 1,2 kg","Knorr ζωμός βοδινού σε πάστα 1,2kg","Knorr ζωμός λαχανικών σε σκόνη 1,25kg","Knorr ζωμός λαχανικών σε πάστα 1,5kg","Knorr σούπα μανιτάρι porcini κρέμα 850g","Knorr σάλτσα σόγιας 1L","Knorr σάλτσα μπάρμπεκιου 2,2L","Κρέμα βαλσαμικό 500ml","Γλυκό κουταλιού σύκο 3kg","Γλυκό κουταλιού βύσσινο 3kg","Γλυκό κουταλιού πορτοκάλι 3kg","Κορν φλάουρ 2,5kg","Αγουράκι τουρσί 680g","Κάπαρη 1000g","Τόνος σε νερό 160g","Καλαμπόκι σε άλμη 340g","Μανιτάρια κομμένα 400g","Αλεύρι γενικής χρήσης 1kg","Φαρίνα 500g","Ρύζι καρολίνα 5kg","Ρύζι μπονέτ 5kg","Ρύζι μπασμάτι 5kg","Φακή ψιλή 500g","Ρεβύθι χοντρό 500g","Τορτελίνι 1kg","Αλάτι ψιλό κουβά 12,5kg","Αλάτι χοντρό no2 5kg","Ρίγανη A' 0,5kg","Πιπέρι κόκκινο γλυκό 1kg","Σκόρδο σκόνη 1kg","Μαύρο πιπέρι αλεσμένο 1kg","Γάλα 3,5%","Γάλα 1,5%","Γαλατάκια μερίδας 7,3ml","Εβαπορέ 410g","Γάλα αμυγδάλου 1L","Γάλα σόγιας 1L","Γάλα καρύδας 1L","Μείγμα για ζελέ γεύση ανανά 2kg","Μείγμα για κρεμ καραμελέ 2kg","Λάδια 10L","Πιπεράκια τουρσί 5kg","Ελιές Καλαμών 5kg","Ελιές θρούμπα 5kg","Ελιές πράσινες 5kg","Ελιές ροδέλα Καλαμών 5kg","Ελιές ροδέλα πράσινες 5kg","Κάρι","Σπυρί κόκκους πιπέρι","Υγρό για πάτωμα κεράσι","Ξύλο κανέλας","Κρουτόν"
-      ].map(n => ({ name:n, boxes:0, secondValue:0, secondUnit:'pieces' }))
+        "Ξύδι 390ml","Λεμόνι 370ml","Ξύδι 5L","Καστανή ζάχαρη 1kg","Λευκή ζάχαρη 1kg","Ζάχαρη καστανή στικ","Ζάχαρη λευκή στικ","Οδοντογλυφίδες","Στέβια στικ","Μέλι στικ","Μέλι μερίδα","Μέλι κουβά 5kg","Μερέντα μερίδα","Μαρμελάδα ροδάκινο μερίδα","Μαρμελάδα βερίκοκο","Μαρμελάδα φράουλα μερίδα","Μουστάρδα 4,2kg","Κέτσαπ 4,1kg","Κετσαπ στικ","Μαγιονέζα στικ","Μουστάρδα στικ","Πούλπα τομάτας 4100g","Τοματοπολτός 4500g","Κονκασέ 2500g","Πιπεριά κόκκινη ψητή 4100g","Κρεμμυδάκια Στιφάδο 2000g","Ντολμαδάκια 2000g","Φασολάκια γίγας 2000g","Κόκκινα φασόλια 2500g","Φασόλια μαγειρεμένα 2620g","Μανιτάρια τεμαχισμένα 2450g","Μανιτάρια ολόκληρα 2500g","Κομπόστα Φρουτοσαλάτα 2550g","Κομπόστα αχλάδια μισοκομμένα 1500g","Κομπόστα ροδέλες ανανά 3000g","Κομπόστα ροδάκινα σε φέτες 2600g","Μακαρόνια πέννες ριγέ","Μακαρόνια τριβελάκι χρώμα","Μακαρόνια τριβελάκι","Μακαρόνια φιογκάκια","Μακαρόνια κοφτό","Μακαρόνια παστίτσιο","Σπαγγέτι no6","Μακαρόνια Λαζανάκι","Κους κους","Κριθαράκι μέτριο","Knorr Σάλτσα Demi glace 1,2kg","Knorr Σούπα τομάτα κρέμα 1kg","Knorr ζωμός κότας σε πάστα 1,2 kg","Knorr ζωμός βοδινού σε πάστα 1,2kg","Knorr ζωμός λαχανικών σε σκόνη 1,25kg","Knorr ζωμός λαχανικών σε πάστα 1,5kg","Knorr σούπα μανιτάρι porcini κρέμα 850g","Knorr σάλτσα σόγιας 1L","Knorr σάλτσα μπάρμπεκιου 2,2L","Κρέμα βαλσαμικό 500ml","Γλυκό κουταλιού σύκο 3kg","Γλυκό κουταλιού βύσσινο 3kg","Γλυκό κουταλιού πορτοκάλι 3kg","Κορν φλάουρ 2,5kg","Αγουράκι τουρσί 680g","Κάπαρη 1000g","Τόνος σε νερό 160g","Καλαμπόκι σε άλμη 340g","Μανιτάρια κομμένα 400g","Αλεύρι γενικής χρήσης 1kg","Φαρίνα 500g","Ρύζι καρολίνα 5kg","Ρύζι μπονέτ 5kg","Ρύζι μπασμάτι 5kg","Φακή ψιλή 500g","Ρεβύθι χοντρό 500g","Τορτελίνι 1kg","Αλάτι ψιλό κουβά 12,5kg","Αλάτι χοντρό no2 5kg","Ρίγανη A' 0,5kg","Πιπέρι κόκκινο γλυκό 1kg","Σκόρδο σκόνη 1kg","Μαύρο πιπέρι αλεσμένο 1kg","Γάλα 3,5%","Γάλα 1,5%","Γαλατάκια μερίδας 7,3ml","Εβαπορέ 410g","Γάλα αμυγδάλου 1L","Γάλα σόγιας 1L","Γάλα καρύδας 1L","Μείγμα για ζελέ γεύση ανανά 2kg","Μείγμα για κρεμ καραμελέ 2kg","Βανίλια σκόνη","Γαρίφαλο σπυρί 1kg","Σακούλες τσάντα 50cm","Καπνιστό αλάτι","Μπαχάρι σπυρί 1kg","Ξύλο κανέλας","Μοσχοκάρυδο τριμμένο","Καπνιστή πάπρικα 1kg","Μπουκοβο καυτερό 1kg","Κρουτόν","Μπαχάρι σκόνη 1kg","Δάφνη",
+        "Τσιμενί","Μουστάρδα σκόνη","Αστεροειδή γλυκάνισο","Baking powder Κούβα 2kg","Κόλιανδρο σκόνη 1kg","Λάδια 10L","Πιπεράκια τουρσί 5kg","Ελιές Καλαμών 5kg","Ελιές θρούμπα 5kg","Ελιές πράσινες 5kg","Ελιές ροδέλα Καλαμών 5kg","Ελιές ροδέλα πράσινες 5kg","Κάρι","Κόλιανδρο σπυρί 1kg","Σπυρί κόκκους πιπέρι","Υγρό για πάτωμα κεράσι","Κουρκουμάς","Θυμάρι","Βασιλικό","Δεντρολίβανο"
+      ].map(n => ({ name: n, boxes: 0, secondValue: 0, secondUnit: 'pieces' }))
+    },
+    { name: 'Καφέδες', products: [
+        "Nestle cocoa beverage 1kg","Nestle Dairy whitener powder low in fat 1kg","Nescafé Intense 500gr","Nescafé Classic Sticks","Nescafé Intenso 1kg","Nescafé Classic 550g","Λουμίδης Ελληνικός 981g","Cafiza2","Nescafé Classic Decaf 200g","Nestle ρόφημα σοκολάτας σκόνη 1kg","Plantage Filter Coffee 488g","Buondi Decaffe φακελάκια"
+      ].map(n => ({ name: n, boxes: 0, secondValue: 0, secondUnit: 'pieces' }))
+    },
+    { name: 'BOSKOS', products: [
+        "Ελιές Καλαμών 5kg","Ελιές πράσινες 5kg","Ελιές ροδέλα Καλαμών 5kg","Ελιές ροδέλα πράσινες 5kg","Πιπεράκι τουρσί 5kg","Μουστάρδα σκόνη","Καπνιστή πάπρικα 1kg","Αλάτι χοντρό 10kg","Μοσχοκάρυδο τριμμένο","Γαρίφαλο σπυρί 1kg","Μπουκοβο καυτερό 1kg","Κόλιανδρο σκόνη 1kg","Κόλιανδρο σπυρί 1kg"
+      ].map(n => ({ name: n, boxes: 0, secondValue: 0, secondUnit: 'pieces' }))
     }
   ];
 
@@ -576,20 +444,15 @@
     }));
   }
 
-  function saveToStorage() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ categories }));
-  }
+  function saveToStorage() { localStorage.setItem(STORAGE_KEY, JSON.stringify({ categories })); }
 
   function loadFromStorage() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) { initializeCategories(); return; }
     try {
       const data = JSON.parse(raw);
-      if (data.categories && Array.isArray(data.categories)) {
-        categories = data.categories;
-      } else {
-        initializeCategories();
-      }
+      if (data.categories && Array.isArray(data.categories)) categories = data.categories;
+      else initializeCategories();
     } catch(e) { initializeCategories(); }
   }
 
@@ -597,7 +460,7 @@
   if (categories.length === 0) initializeCategories();
   activeCategoryId = categories[0]?.id || null;
 
-  // ---------- UI ----------
+  // --- UI Rendering ---
   function renderTabs() {
     const container = document.getElementById('tabsContainer');
     let html = '';
@@ -641,7 +504,7 @@
     }
 
     let html = '';
-    filtered.forEach((p, filteredIdx) => {
+    filtered.forEach((p) => {
       const originalIndex = cat.products.findIndex(prod => prod.name === p.name);
       const unitLabel = { pieces:'Τεμάχια', kg:'Κιλά', pallet:'Παλέτα' }[p.secondUnit] || 'Τεμάχια';
       const step = p.secondUnit === 'kg' ? '0.1' : '1';
@@ -716,7 +579,7 @@
 
   window.filterActiveTab = () => renderCurrentCategoryProducts(document.getElementById('search').value);
 
-  // ---------- Ποσότητες ----------
+  // --- Ποσότητες ---
   window.changeQty = (catId, idx, type, delta) => {
     const cat = categories.find(c => c.id === catId);
     if (!cat) return;
@@ -740,7 +603,7 @@
     renderCurrentCategoryProducts(document.getElementById('search').value);
   };
 
-  // ---------- Προϊόντα ----------
+  // --- Προϊόντα ---
   window.deleteProduct = (catId, idx) => {
     const cat = categories.find(c => c.id === catId);
     const prod = cat.products[idx];
@@ -750,54 +613,43 @@
     saveToStorage();
     refreshUI();
   };
-
   window.openAddProductModal = () => {
     document.getElementById('addProductModal').style.display = 'flex';
     document.getElementById('newProductName').value = '';
   };
-  window.closeAddModal = (e) => {
-    if (!e || e.target.id === 'addProductModal') document.getElementById('addProductModal').style.display = 'none';
-  };
+  window.closeAddModal = (e) => { if (!e || e.target.id === 'addProductModal') document.getElementById('addProductModal').style.display = 'none'; };
   window.addNewProduct = () => {
     const input = document.getElementById('newProductName');
     const name = input.value.trim();
     if (!name) { alert('Δώστε όνομα'); return; }
     const cat = categories.find(c => c.id === activeCategoryId);
-    if (cat.products.some(p => p.name.toLowerCase() === name.toLowerCase())) {
-      alert('Υπάρχει ήδη'); return;
-    }
+    if (cat.products.some(p => p.name.toLowerCase() === name.toLowerCase())) { alert('Υπάρχει ήδη'); return; }
     cat.products.push({ name, boxes:0, secondValue:0, secondUnit:'pieces' });
     input.value = '';
     document.getElementById('addProductModal').style.display = 'none';
     saveToStorage();
     refreshUI();
   };
-
   window.openEditProductModal = (catId, idx) => {
     const cat = categories.find(c => c.id === catId);
     pendingEditProduct = { catId, idx };
     document.getElementById('editProductNameInput').value = cat.products[idx].name;
     document.getElementById('editProductModal').style.display = 'flex';
   };
-  window.closeEditModal = (e) => {
-    if (!e || e.target.id === 'editProductModal') document.getElementById('editProductModal').style.display = 'none';
-  };
+  window.closeEditModal = (e) => { if (!e || e.target.id === 'editProductModal') document.getElementById('editProductModal').style.display = 'none'; };
   window.saveEditedProduct = () => {
     if (!pendingEditProduct) return;
     const { catId, idx } = pendingEditProduct;
     const newName = document.getElementById('editProductNameInput').value.trim();
     if (!newName) { alert('Το όνομα δεν μπορεί να είναι κενό'); return; }
     const cat = categories.find(c => c.id === catId);
-    if (cat.products.some((p,i) => i !== idx && p.name.toLowerCase() === newName.toLowerCase())) {
-      alert('Υπάρχει ήδη προϊόν με αυτό το όνομα'); return;
-    }
+    if (cat.products.some((p,i) => i !== idx && p.name.toLowerCase() === newName.toLowerCase())) { alert('Υπάρχει ήδη προϊόν με αυτό το όνομα'); return; }
     cat.products[idx].name = newName;
     saveToStorage();
     document.getElementById('editProductModal').style.display = 'none';
     pendingEditProduct = null;
     refreshUI();
   };
-
   window.openUnitModal = (catId, idx) => {
     pendingUnitChange = { catId, idx };
     document.getElementById('unitModal').style.display = 'flex';
@@ -814,39 +666,24 @@
     refreshUI();
   }));
 
-  // Κατηγορίες
+  // --- Κατηγορίες ---
   window.openCategoryManager = () => {
     renderCategoryManagerList();
     document.getElementById('categoryManagerModal').style.display = 'flex';
   };
-  window.closeCategoryManager = (e) => {
-    if (!e || e.target.id === 'categoryManagerModal') document.getElementById('categoryManagerModal').style.display = 'none';
-  };
+  window.closeCategoryManager = (e) => { if (!e || e.target.id === 'categoryManagerModal') document.getElementById('categoryManagerModal').style.display = 'none'; };
   function renderCategoryManagerList() {
     const container = document.getElementById('categoryListContainer');
     let html = '';
     categories.forEach(cat => {
-      html += `
-        <div class="category-item">
-          <span class="category-name">${escapeHtml(cat.name)}</span>
-          <div class="category-actions">
-            <button onclick="renameCategory('${cat.id}')" title="Μετονομασία">✏️</button>
-            <button onclick="deleteCategory('${cat.id}')" title="Διαγραφή" ${categories.length<=1?'disabled':''}>🗑️</button>
-          </div>
-        </div>
-      `;
+      html += `<div class="category-item"><span class="category-name">${escapeHtml(cat.name)}</span><div class="category-actions"><button onclick="renameCategory('${cat.id}')" title="Μετονομασία">✏️</button><button onclick="deleteCategory('${cat.id}')" title="Διαγραφή" ${categories.length<=1?'disabled':''}>🗑️</button></div></div>`;
     });
     container.innerHTML = html || '<div style="padding:10px;text-align:center">Καμία κατηγορία</div>';
   }
   window.renameCategory = (catId) => {
     const cat = categories.find(c => c.id === catId);
     const newName = prompt('Νέο όνομα κατηγορίας:', cat.name);
-    if (newName && newName.trim()) {
-      cat.name = newName.trim();
-      saveToStorage();
-      refreshUI();
-      renderCategoryManagerList();
-    }
+    if (newName && newName.trim()) { cat.name = newName.trim(); saveToStorage(); refreshUI(); renderCategoryManagerList(); }
   };
   window.deleteCategory = (catId) => {
     if (categories.length <= 1) { alert('Πρέπει να υπάρχει τουλάχιστον μία κατηγορία.'); return; }
@@ -861,20 +698,14 @@
     const inp = document.getElementById('newCategoryName');
     const name = inp.value.trim();
     if (!name) { alert('Δώστε όνομα'); return; }
-    const newCat = {
-      id: `cat_${Date.now()}`,
-      name: name,
-      products: [],
-      deleted: []
-    };
-    categories.push(newCat);
+    categories.push({ id: `cat_${Date.now()}`, name, products: [], deleted: [] });
     inp.value = '';
     saveToStorage();
     refreshUI();
     renderCategoryManagerList();
   };
 
-  // Διεγραμμένα
+  // --- Διεγραμμένα ---
   window.showDeletedModal = () => {
     const container = document.getElementById('deletedListContainer');
     let html = '';
@@ -883,15 +714,7 @@
       html += `<h4 style="margin:10px 0 4px; color:#1e3a5f;">${escapeHtml(cat.name)}</h4>`;
       cat.deleted.forEach((item, idx) => {
         const unitLabel = { pieces:'Τεμ', kg:'Kg', pallet:'Παλ' }[item.secondUnit]||'Τεμ';
-        html += `
-          <div class="deleted-item">
-            <span><strong>${escapeHtml(item.name)}</strong> (${unitLabel})</span>
-            <div style="display:flex; gap:4px;">
-              <button class="restore-btn" onclick="restoreProduct('${cat.id}', ${idx})">↩️</button>
-              <button class="perm-delete-btn" onclick="permanentDelete('${cat.id}', ${idx})">🗑️</button>
-            </div>
-          </div>
-        `;
+        html += `<div class="deleted-item"><span><strong>${escapeHtml(item.name)}</strong> (${unitLabel})</span><div style="display:flex; gap:4px;"><button class="restore-btn" onclick="restoreProduct('${cat.id}', ${idx})">↩️</button><button class="perm-delete-btn" onclick="permanentDelete('${cat.id}', ${idx})">🗑️</button></div></div>`;
       });
     });
     container.innerHTML = html || '<div style="text-align:center;padding:20px;">📭 Κανένα διεγραμμένο</div>';
@@ -901,10 +724,7 @@
   window.restoreProduct = (catId, delIdx) => {
     const cat = categories.find(c => c.id === catId);
     const item = cat.deleted[delIdx];
-    if (cat.products.find(p => p.name === item.name)) {
-      alert('Υπάρχει ήδη προϊόν με αυτό το όνομα.');
-      return;
-    }
+    if (cat.products.find(p => p.name === item.name)) { alert('Υπάρχει ήδη προϊόν με αυτό το όνομα.'); return; }
     cat.products.push({ name: item.name, boxes:0, secondValue:0, secondUnit: item.secondUnit });
     cat.deleted.splice(delIdx, 1);
     saveToStorage();
@@ -919,14 +739,12 @@
       showDeletedModal();
     }
   };
-
   window.clearAllQuantities = () => {
     if (!confirm('Μηδενισμός όλων των ποσοτήτων σε ΟΛΕΣ τις κατηγορίες;')) return;
     categories.forEach(cat => cat.products.forEach(p => { p.boxes=0; p.secondValue=0; p.secondUnit='pieces'; }));
     saveToStorage();
     refreshUI();
   };
-
   window.scanBarcode = () => {
     const code = prompt('Εισάγετε barcode ή όνομα:');
     if (!code) return;
@@ -942,93 +760,47 @@
     saveToStorage();
     refreshUI();
   };
-
   window.exportPDF = () => {
     const all = [];
-    categories.forEach(cat => {
-      cat.products.forEach(p => { if (p.boxes>0 || p.secondValue>0) all.push({ catName: cat.name, ...p }); });
-    });
+    categories.forEach(cat => { cat.products.forEach(p => { if (p.boxes>0 || p.secondValue>0) all.push({ catName: cat.name, ...p }); }); });
     if (!all.length) { alert('Κανένα απόθεμα.'); return; }
-
     const grouped = {};
     all.forEach(p => { if (!grouped[p.catName]) grouped[p.catName] = []; grouped[p.catName].push(p); });
-
     const formatQty = (val, unit) => {
       if (val === 0) return '';
       let num = (unit === 'kg') ? val.toFixed(1) : val.toFixed(0);
       let unitText = { pieces:'τεμ.', kg:'kg', pallet:'παλ.' }[unit] || '';
       return `${num} ${unitText}`;
     };
-
-    let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>THASSOS IMPERIAL</title>
-      <style>
-        body { font-family: system-ui, sans-serif; font-size:12px; padding:20px; background:white; }
-        h1 { color:#1e3a5f; text-align:center; margin-bottom:0; }
-        .date { text-align:center; margin:4px 0 24px; font-size:14px; color:#2c4b6b; }
-        .category { margin-top:24px; page-break-inside:avoid; }
-        .category h2 { background:#1e3a5f; color:white; padding:8px 12px; border-radius:8px; font-size:15px; }
-        table { width:100%; border-collapse:collapse; margin-bottom:16px; }
-        th { background:#d9e6f2; font-weight:700; padding:8px 4px; border:1px solid #a0bbd0; }
-        td { border:1px solid #ccc; padding:8px 4px; }
-        td:first-child { font-weight:500; }
-        td:nth-child(2), td:nth-child(3) { text-align:center; font-weight:700; }
-        .non-zero { background:#d4edda !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-        .footer { margin-top:30px; text-align:center; color:#6f8fae; }
-        @media print { body { padding:0; margin:0.5cm; } .category { page-break-inside:avoid; } }
-      </style>
-    </head><body>
-      <h1>THASSOS IMPERIAL</h1>
-      <div class="date">${new Date().toLocaleDateString('el-GR')}</div>
-    `;
-
+    let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>THASSOS IMPERIAL</title><style>body{font-family:sans-serif;font-size:12px;padding:20px;background:white}h1{color:#1e3a5f;text-align:center}.date{text-align:center;margin:4px 0 24px}.category{margin-top:24px}.category h2{background:#1e3a5f;color:white;padding:8px 12px;border-radius:8px}table{width:100%;border-collapse:collapse}th{background:#d9e6f2;font-weight:700;padding:8px 4px;border:1px solid #a0bbd0}td{border:1px solid #ccc;padding:8px 4px}td:first-child{font-weight:500}td:nth-child(2),td:nth-child(3){text-align:center}.non-zero{background:#d4edda!important}@media print{body{padding:0;margin:.5cm}}</style></head><body><h1>THASSOS IMPERIAL</h1><div class="date">${new Date().toLocaleDateString('el-GR')}</div>`;
     for (let catName in grouped) {
       html += `<div class="category"><h2>${escapeHtml(catName)}</h2><table><thead><tr><th>Προϊόν</th><th>Κιβώτια</th><th>Ποσότητα</th></tr></thead><tbody>`;
       grouped[catName].forEach(p => {
-        const boxDisplay = p.boxes === 0 ? '' : p.boxes;
-        const secDisplay = p.secondValue === 0 ? '' : formatQty(p.secondValue, p.secondUnit);
-        html += `<tr><td>${escapeHtml(p.name)}</td><td class="${p.boxes>0?'non-zero':''}">${boxDisplay}</td><td class="${p.secondValue>0?'non-zero':''}">${secDisplay}</td></tr>`;
+        html += `<tr><td>${escapeHtml(p.name)}</td><td class="${p.boxes>0?'non-zero':''}">${p.boxes||''}</td><td class="${p.secondValue>0?'non-zero':''}">${formatQty(p.secondValue,p.secondUnit)}</td></tr>`;
       });
       html += `</tbody></table></div>`;
     }
-    html += `<div class="footer">Thank You</div></body></html>`;
+    html += `<div class="footer" style="margin-top:30px;text-align:center;color:#6f8fae">Thank You</div></body></html>`;
     const win = window.open('', '_blank');
     win.document.write(html);
     win.document.close();
     win.print();
   };
 
-  // ---------- SCROLL & SEARCH ----------
+  // --- Scroll & Search ---
   const scrollBtn = document.getElementById('scrollToTopBtn');
   const searchSection = document.getElementById('searchSection');
-
   function updateSearchVisibility() {
-    if (window.scrollY <= 10) {
-      searchSection.classList.remove('hidden');
-    } else {
-      searchSection.classList.add('hidden');
-    }
+    if (window.scrollY <= 10) searchSection.classList.remove('hidden');
+    else searchSection.classList.add('hidden');
   }
-
   window.addEventListener('scroll', () => {
-    if (window.scrollY > 300) {
-      scrollBtn.classList.add('visible');
-    } else {
-      scrollBtn.classList.remove('visible');
-    }
+    if (window.scrollY > 300) scrollBtn.classList.add('visible');
+    else scrollBtn.classList.remove('visible');
     updateSearchVisibility();
   });
-
-  scrollBtn.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    searchSection.classList.remove('hidden');
-  });
-
-  window.toggleSearch = () => {
-    searchSection.classList.remove('hidden');
-    document.getElementById('search').focus();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
+  scrollBtn.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); searchSection.classList.remove('hidden'); });
+  window.toggleSearch = () => { searchSection.classList.remove('hidden'); document.getElementById('search').focus(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
   updateSearchVisibility();
   refreshUI();
 </script>
