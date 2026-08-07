@@ -91,7 +91,7 @@
     .modal.open{display:flex;}
     .modal-box{background:white;border-radius:20px;padding:20px 16px;width:90%;max-width:500px;max-height:80vh;overflow-y:auto;box-shadow:0 20px 35px rgba(0,0,0,.2);}
     .modal-box h3{margin:0 0 16px;color:#1e3a5f;text-align:center;font-weight:700;font-size:18px;}
-    .modal-box input{padding:12px 14px;margin:6px 0;background:#f4f9ff;border:1px solid #cbdbe9;border-radius:30px;font-size:15px;width:100%;outline:none;}
+    .modal-box input,.modal-box select{padding:12px 14px;margin:6px 0;background:#f4f9ff;border:1px solid #cbdbe9;border-radius:30px;font-size:15px;width:100%;outline:none;}
     .btn-primary{margin-top:12px;padding:12px;width:100%;background:#1e3a5f;color:white;border:none;border-radius:30px;font-weight:bold;font-size:15px;cursor:pointer;touch-action:manipulation;display:block;}
     .unit-opt{padding:12px;margin:4px 0;background:#f0f5fa;border-radius:30px;text-align:center;font-weight:600;cursor:pointer;}
     .unit-opt:hover,.unit-opt:active{background:#1e3a5f;color:white;}
@@ -379,7 +379,7 @@
     #scrollBtn{background:#191c1f!important;border:1px solid rgba(217,183,122,.35)!important;color:#fff!important;}
     .modal-box{background:#121517!important;color:#fff!important;border:1px solid rgba(255,255,255,.12)!important;}
     .modal-box h3{color:#fff!important;}
-    .modal-box input{background:rgba(255,255,255,.07)!important;color:#fff!important;border:1px solid rgba(255,255,255,.16)!important;}
+    .modal-box input,.modal-box select{background:rgba(255,255,255,.07)!important;color:#fff!important;border:1px solid rgba(255,255,255,.16)!important;}
     .btn-primary{background:#24282b!important;border:1px solid rgba(217,183,122,.45)!important;}
     .cat-item{background:rgba(255,255,255,.06)!important;}
     .cat-name{color:#fff!important;}
@@ -957,6 +957,9 @@ body{
   .action-bar.compact-actions{gap:5px!important;}
   .action-bar.compact-actions button{font-size:10px!important;padding:8px 2px!important;}
 }
+.product.photo-uploading{opacity:.68!important;pointer-events:none!important;position:relative!important;}
+.product.photo-uploading::after{content:'📤';position:absolute;left:12px;top:12px;font-size:18px;animation:photoPulse .8s ease-in-out infinite alternate;}
+@keyframes photoPulse{from{transform:scale(.9);opacity:.55}to{transform:scale(1.08);opacity:1}}
 
 </style>
 </head>
@@ -1019,7 +1022,12 @@ body{
 <div class="modal-box" onclick="event.stopPropagation()">
 <h3>➕ Προϊόν</h3>
 <input autocomplete="off" id="newName" oninput="checkDup()" placeholder="Όνομα προϊόντος" type="text"/>
-<div id="dupWarn" style="color:red;font-size:12px;margin-top:4px;min-height:16px;"></div>
+<select id="newUnit" onchange="checkDup()" aria-label="Μονάδα προϊόντος">
+<option value="pieces">📦 Τεμάχια</option>
+<option value="kg">⚖️ Κιλά</option>
+<option value="pallet">🏗️ Παλέτα</option>
+</select>
+<div id="dupWarn" style="font-size:12px;margin-top:4px;min-height:16px;"></div>
 <button class="btn-primary" onclick="addProduct()">Προσθήκη</button>
 </div>
 </div>
@@ -1076,10 +1084,11 @@ body{
 
 <script>
 "use strict";
+// Duplicate policy v3: full description + packaging/size + stock unit
 
 // ════════════════════════════════════════════
 // EMBEDDED DATA — ενημερώνεται αυτόματα με "💾 HTML"
-var EMBEDDED_DATA = [{"id": "c1778690756412_0", "name": "Ιορδάνου", "products": [{"name": "Κουτί πίτσας", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://papabros.gr/wp-content/uploads/2024/01/KOUTI_PITSAS_KRAFT_WOOD_36%CE%A736%CE%A74_PAPABROS.jpg"}, {"name": "Ξυλάκι γκολφ 12εκ", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://sphoreca.gr/wp-content/uploads/2025/12/wp-image5157.jpg"}, {"name": "Σκαφάκια craft", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://olaproducts.gr/wp-content/uploads/2022/09/QB23_1-300x225.jpg.webp"}, {"name": "Bowl στρογγυλό", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://cdn.gmhoreca.gr/model/product_m/7281_d7bf90f571ed729988d401d1c2f6fd870a7449fb_image_1920.webp"}, {"name": "Καπάκια για bowl στρογγυλό", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Bowl τετράγωνο", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://thumbs.nmstore.gr/thumb/edetorakisv4/1920:webp/604799/products_upload/00045435_1.jpg"}, {"name": "Καπάκια για bowl τετράγωνο", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Λαδόκολλα καφέ 20χ30", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOG96PCl0blk7iqw4knpWD_-BctM_fl4qLn_mTDMn9SA&s=10"}, {"name": "Ρολό wypall κανάτα", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://www.acpe.gr/products_img/1763201632_0_7260.jpg"}, {"name": "Wrapmaster μεμβράνη 30cm x 300m", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Wrapmaster μεμβράνη 45cm x 300m", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Σακούλες για πάγο", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPOCJAAJC6egBzTUL5piM_edOZlJqhb3NdiKJi81UQjw&s=10"}, {"name": "Σακούλες κόκκινες", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://www.b2b-shop.gr/image/cache/catalog/proionta/spiti/eidi-katharismou/sakoules/sakoules-aporimatwn-aromtatikes-me-kordoni-homeex-72x95-set-10tem-5200126294979-3-1000x1000.png"}, {"name": "Σακούλες μπλε", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://kalamaras.gr/wp-content/uploads/2024/03/51409.jpg"}, {"name": "Ρολό χάρτη 2χ4,5 kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Τραπεζομάντηλα", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://xfood.gr/wp-content/uploads/2024/03/Xartino-Trapezomantilo-Maxi-1x1.3.jpg"}, {"name": "Χαρτοπετσέτες", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSvrBHdfd7-22V6beLG5yELqj4CbdLlHr9_ktGTYRFafA&s=10"}, {"name": "Ρολό βετεξ μπλε", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDzfweAwqKEKWPb1jeFYEqbFPmPh7gXl2RPLlCOB0h5A&s=10"}, {"name": "Ρολό βετεξ κίτρινο", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHNkvm0yRVi5e3rfMS0U3r4O1_H_9H3Bmn_AiTUqPvxA&s=10"}, {"name": "Σύρμα σπιράλ", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnIO0SQ14B6NETI3rhwqjq_0xVyh3w6SRZPkU42HYSEQ&s=10"}, {"name": "Σφουγγάρια μεγάλα 14χ9", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQcFrJDwt8FkYrg53e_pN4B4-zz8Jic07Qr5y0U0nLvXA&s=10"}, {"name": "Σφουγγάρι 10χ7χ3", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNQRyWxIv8mO4BC73HzEC_HiBYM3XYt6e9KCQjtPq2Xw&s=10"}, {"name": "Μάπα *σφουγγαρίστρα μεγάλη", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Solid hero 4,5kg", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbXZMbQnn2uEF_DkP3DKUxYwFQpSwgrj9O9bbWWlm7Pg&s=10"}, {"name": "Kichen pro duo 2L καθαριστικό για κουζίνα", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Clear dry hdp plus 5 L", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Regain 5L", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZbPTIEjn2LikkFhaVQy3-0niHuK1qo776HgAmF01dag&s=10"}, {"name": "Χλωρίνη παχύρρευστη 5L", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLcHe5ZHirTV8ZFS-fIe2OMgD-7OAEGTDoaNYlLNZSRw&s=10"}, {"name": "Assert fresh so 5L απορρυπαντικό για πλύσιμο πιάτων στο χέρι", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Assert fresh so 20kg απορρυπαντικό για πλύσιμο πιάτων στο χέρι", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Toprinse hd so στεγνωτικό πλυντήριο πιάτων 20kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Topmatic crystal so απορρυπαντικό για πλυντήριο 25kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Αεροζόλ για μηχανήματα", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Imi orange γενική καθαριστικό κουζίνας", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Kichen pro des special 2L απολυμαντικό επιφάνειας", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Greaselift 2L", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_GTKRn8enF-ou2C-djvdV73c-vk6lFvNVSfF21fsRMw&s=10"}, {"name": "D-rinse plus στεγνωτικό πλυντήριο 5L", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Drop extra απορρυπαντικό πλυντηρίου 5L", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Γάντια μαύρα S", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://www.emporico.gr/cdn/shop/files/gantia-nitriliou-mayra-sam.jpg?v=1773665490"}, {"name": "Γάντια μαύρα M", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTp19cKXfVnaKv2T7J_dt1Aqg0fFBF4MHJY9t5G2g5ENA&s=10"}, {"name": "Γάντια μαύρα L", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://www.pharmacy1.gr/wp-content/uploads/2025/12/ALFASHIELD-GANTIA-NITRIL-BLACK-L-1.webp"}, {"name": "Γάντια μαύρα Xl", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAQHUj8tvha-6vWsvOAKPuzMkvvRxBUuwmOLySJnTxjA&s=10"}, {"name": "Γάντια με πούδρα Xl", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9RbSfqqTUUF3wX5EffDw0VppMQrUbtJK85WDKe3PftQ&s=10"}, {"name": "Γάντια κόκκινα Μ", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXUSM4SWKjkau77TfZ_8f5xAFWJrw-hh9zqF7zdrk0Yg&s=10"}, {"name": "Γάντια κόκκινα L", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXUSM4SWKjkau77TfZ_8f5xAFWJrw-hh9zqF7zdrk0Yg&s=10"}, {"name": "Ποτήρι πλαστικό", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSz21wT3WMiM8MIp7n0H8nRRcWvdsJSZpWPhZboozz_0A&s=10"}, {"name": "Καπάκια για ποτήρι πλαστικό", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Χάρτινο ποτήρι μεγάλο", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Καπάκια για χάρτινο ποτήρι μεγάλο", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Χάρτινο ποτήρι μεσαίο", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Καπάκι για χάρτινο ποτήρι μεσαίο", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Χάρτινο ποτήρι μικρό", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Καπάκι για χάρτινο ποτήρι μικρό", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Καλαμάκια χοντρά", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://bizblend.gr/wp-content/uploads/2024/02/%CE%A3%CF%84%CE%B9%CE%B3%CE%BC%CE%B9%CF%8C%CF%84%CF%85%CF%80%CE%BF-%CE%BF%CE%B8%CF%8C%CE%BD%CE%B7%CF%82-2026-04-21-151306.png"}, {"name": "Καλαμάκια για φραπέ", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Καλαμάκια για φρέντο", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Αναδευτήρες", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://www.sixtyseconds.gr/datafiles/560.jpg"}, {"name": "Ξυλάκι φιόγκος 12cm", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQUqL447u8UAIcgpGg1KFju4p2jwOdU2f6FwQnV2FJGcA&s=10"}, {"name": "Μαχαιροπήρουνα", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://bizblend.gr/wp-content/uploads/2024/01/3959736394.webp"}, {"name": "Κουταλάκια για παγωτό", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Ταμπλέτες multi κουβάς", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDL7eElqb9t7lsIZXcfvAxT9JHKPJkwyuZKXm-Ui8gtw&s=10"}, {"name": "Σοκ κουβάς", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRrrG9EvgmaR75L2npKtC3Nx1BK9cbmTzf-7mrkEvJUQ&s=10"}, {"name": "Λαδόκολλα μεγάλη", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDspelUoSEgKQurbplJBCo_Rd6scOUUj18JA-1RdCeNA&s=10"}, {"name": "Σκεύη για γιαούρτι", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Σκουπα", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://www.sixtyseconds.gr/datafiles/838.jpg"}, {"name": "Κοντάρι μικρο βιδομα", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Σφουγαριστρα", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Κονταρι μεγαλο βιδομα", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Κουβα για σφουγγαρίστρα", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Φαράσι", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJS7IHy1s262zM-R1S1KWuONrRYInU8xGu6B6bARhYsA&s=10"}, {"name": "Κονταρι για φαρασι", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}], "deleted": []}, {"id": "c1778690756412_1", "name": "Bikre ταβέρνα", "products": [{"name": "Πατάτες fry'n dip", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnKCdEssXQls2qm6YWY0bES8lGwrLTldQrplAktuDygg&s=10"}, {"name": "Γύρο χοιρινό", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTEs0t4_9tlSBkXCzcRpKR5duTHAR50nzw1-PWysTUrQQ&s=10"}, {"name": "Γύρο κοτόπουλο", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZ1SlSVOxhCebmiZNziQavKDkC-JCFiyXG_Qh785u1ug&s=10"}, {"name": "Σουβλάκι κοτόπουλο χειρ.100g", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Σουβλάκι χοιρινό χειρ.100g", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Σουβλακι κοτο-μπεικον", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Πανσέτα νωπή μ/ο", "boxes": 0, "sv": 0, "su": "kg", "img": ""}, {"name": "Σνίτσελ χοιρινό νωπό", "boxes": 0, "sv": 0, "su": "kg", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSK6XhoNPTQsZHbPKI7ISwkQHtX8ph7duX1Y96f8PtcPg&s=10"}, {"name": "Σνίτσελ κοτόπουλο νωπό", "boxes": 0, "sv": 0, "su": "kg", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcStNleysp9LyunHQ4aQI0wk7zvhG5CH9V4YIvOYaEhHXQ&s=10"}, {"name": "Σουτζουκάκια τύπου θασου 50g", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Παϊδάκια αρνίσια τεμάχια/να", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Μπριζόλα μοσχαρίσια Μ/Ο", "boxes": 0, "sv": 0, "su": "kg", "img": ""}, {"name": "Μπριζόλα χοιρινή Tomahawk Μ/Ο", "boxes": 0, "sv": 0, "su": "kg", "img": ""}, {"name": "Ψαρονέφρι", "boxes": 0, "sv": 0, "su": "kg", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGHOlbpe-puGwISjdQRsjC_BN07GbNuAnz79CsZXPW3A&s=10"}, {"name": "Κιμάς ανάμεικτος", "boxes": 0, "sv": 0, "su": "kg", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ19nY51jS9yYIjrFrRn55ul3FBxXVAxLirEtBjkrAx3Q&s=10"}, {"name": "Φιλέτο κοτόπουλο", "boxes": 0, "sv": 0, "su": "kg", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlVYDjktMQrNeckVPOwDLGRsqSVYJ5Rlg6SXNFayUSVQ&s=10"}], "deleted": []}, {"id": "c1778690756412_2", "name": "Thasos food taverna", "products": [{"name": "Καλαμάρι", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBADIcWDChRyF7rp4NXFZEPmi0CwTkwd5W4mzFW_UGZw&s=10"}, {"name": "Γαλέο", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Ξιφία", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Χταπόδι", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSi-vZAAaw7ajp7Z1im8KR47B66YnWpK9dvH_vxFNELww&s=10"}, {"name": "Γαρίδες", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS26njB1MsGUwQPKvkGipfHL-jF_jw-FfCdJJbPYCtp3w&s=10"}, {"name": "Κανταΐφι", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT6-7Lr_EeFAStLocYa8THzod0XkMDLc37EMnBSbHNr0g&s=10"}, {"name": "Κασεροκροκέτες", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrMgwnuWoOluqXaOC_ZhmwZKJH6q6JARZe_lBTQY2xYQ&s=10"}, {"name": "Πίτες", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU8AcQYthMl6iuT8NuwTn67Pa_xQ3jZM_gVar-0whdHQ&s=10"}, {"name": "Πατάτες fry'n dip", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnKCdEssXQls2qm6YWY0bES8lGwrLTldQrplAktuDygg&s=10"}], "deleted": []}, {"id": "c1778690756412_3", "name": "Thasosfood ξενοδοχείο ξηρά", "products": [{"name": "Ξύδι 390ml", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROUN4fpQmuDS41lyhyXqTPzy0TjkwQEweWJNcr2kqXBw&s=10"}, {"name": "Λεμόνι 370ml", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAkIb--Ql5UR2AtpRz3OTe7eQ346YT5sO1rcYg0PEibQ&s=10"}, {"name": "Ξύδι 5L", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://www.kore.gr/wp-content/uploads/2018/12/meteora-xidi-kokkino-5lt.jpg"}, {"name": "Καστανή ζάχαρη 1kg", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRADXRMDjCeu19c79PQu60t8oAUQ3X4oj8YIDSCKIhKcw&s=10"}, {"name": "Λευκή ζάχαρη 1kg", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSCVuTfk2cVsFw_A-48Z_36_a-hfG-362R7uv-nSZcpA&s=10"}, {"name": "Ζάχαρη καστανή στικ", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQk4va8KtQJ11UWR3k2mUNSIH1XTw_hLybUcWKOJiq8eQ&s=10"}, {"name": "Ζάχαρη λευκή στικ", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtt9G8109udvn7mPe_Oh6xd0WF54UNPSSU_E57M0N5zQ&s=10"}, {"name": "Οδοντογλυφίδες", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMXDi3rg73ap3k1LoriHcg_W1BTTCwBa9iHul8ijCYZw&s=10"}, {"name": "Στέβια στικ", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTitKy9yq3PEx11Cl-TYFLBPUfWjfExTqPbfXYlEPmNAg&s=10"}, {"name": "Μέλι στικ", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTH6N4rGzCLIgLLv8OxevCQh9id-f7_Xx8wp9UqaU-CQ&s=10"}, {"name": "Μέλι μερίδα", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Μέλι κουβά 5kg", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTffRQa7Mcg5sGjsIysWLqX-v_mdVzBfTBxUR9gGZo3Q&s=10"}, {"name": "Μερέντα μερίδα", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKl2rOw5Dat3iU_vJUdeJwWpLtPQaO2-Ki78HtP_GExw&s=10"}, {"name": "Μαρμελάδα ροδάκινο μερίδα", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Μαρμελάδα βερίκοκο", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://www.coffees.gr/images/detailed/14/mel_appricot.jpg"}, {"name": "Μαρμελάδα φράουλα μερίδα", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Μουστάρδα 4,2kg", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://coffeeland.gr/wp-content/uploads/2024/08/26-003-700x700.png"}, {"name": "Κέτσαπ 4,1kg", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://megafrost.gr/cdn/shop/products/7250826231964_0.png?v=1695386658"}, {"name": "Κετσαπ στικ", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWlFfn9BBOjhIBdDIQpVm-teAfoF-B4s2QOMRJVGIcEA&s=10"}, {"name": "Μαγιονέζα στικ", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTWkOVcNIQ9m3rK8bYnr_pzn8Zfs1dboi9cWYLDkWxjzg&s=10"}, {"name": "Μουστάρδα στικ", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSaBFADUk4sKfa5_kCgUmHjfG-N-rzJ4Ro-Cjva2TkkkA&s=10"}, {"name": "Πούλπα τομάτας 4100g", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSV00PH2uIhfXc-rOOyE9q17_P-mH_oaAo0cJOvg00Bfg&s=10"}, {"name": "Τοματοπολτός 4500g", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSoQWsi_rU8G_A4smuHxg4e3Ob2dtHf4-pcvHq5FQsC0g&s"}, {"name": "Κονκασέ 2500g", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSa1Z3EqJ2gWduGjqx2bO_gmFHQgzB1wJVTavc7pF85Kg&s"}, {"name": "Πιπεριά κόκκινη ψητή 4100g", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQuEgOkjeKiQkfPc7I5IBjuSt_8yfdlKncMQxKZuI2JTw&s=10"}, {"name": "Κρεμμυδάκια Στιφάδο 2000g", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4T-kQhbYoxk5eMCWjetOo5idD6nInchd3OuDFiq0Bsg&s=10"}, {"name": "Ντολμαδάκια 2000g", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBEENyzAUMtcfQ5CYEbAmO7xoy9oM8PsHjisSOfS-HJA&s=10"}, {"name": "Φασολάκια γίγας 2000g", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Κόκκινα φασόλια 2500g", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQd8YBLPG_r6_FpVOmRClUoztETazJdOAvvITHn3koSjA&s=10"}, {"name": "Φασόλια μαγειρεμένα 2620g", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Μανιτάρια τεμαχισμένα 2450g", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwGoW75ro5wnmm5nQfW2Bo6JXPapJYFm8oeSpBXb93FQ&s=10"}, {"name": "Μανιτάρια ολόκληρα 2500g", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Κομπόστα Φρουτοσαλάτα 2550g", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Κομπόστα αχλάδια μισοκομμένα 1500g", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Κομπόστα ροδέλες ανανά 3000g", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Κομπόστα ροδάκινα σε φέτες 2600g", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Μακαρόνια πέννες ριγέ", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Μακαρόνια τριβελάκι χρώμα", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Μακαρόνια τριβελάκι", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Μακαρόνια φιογκάκια", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Μακαρόνια κοφτό", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Μακαρόνια παστίτσιο", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Σπαγγέτι no6", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Μακαρόνια Λαζανάκι", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Κους κους", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Κριθαράκι μέτριο", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Knorr Σάλτσα Demi glace 1,2kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Knorr Σούπα τομάτα κρέμα 1kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Knorr ζωμός κότας σε πάστα 1,2 kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Knorr ζωμός βοδινού σε πάστα 1,2kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Knorr ζωμός λαχανικών σε σκόνη 1,25kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Knorr ζωμός λαχανικών σε πάστα 1,5kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Knorr σούπα μανιτάρι porcini κρέμα 850g", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Knorr σάλτσα σόγιας 1L", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Knorr σάλτσα μπάρμπεκιου 2,2L", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Knorr Σαλτσα τοματας 10kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Dee thai Chilli sauce 700ml", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Κρέμα βαλσαμικό 500ml", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Γλυκό κουταλιού σύκο 3kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Γλυκό κουταλιού βύσσινο 3kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Γλυκό κουταλιού πορτοκάλι 3kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Κορν φλάουρ 2,5kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Κριθαροκουλουρα 1kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Αγουράκι τουρσί 680g", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Κάπαρη 1000g", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Τόνος σε νερό 160g", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Καλαμπόκι σε άλμη 340g", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Μανιτάρια κομμένα 400g", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Αλεύρι γενικής χρήσης 1kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Φαρίνα 500g", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Ρύζι καρολίνα 5kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Ρύζι μπονέτ 5kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Ρύζι μπασμάτι 5kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Φακή ψιλή 500g", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Ρεβύθι χοντρό 500g", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Τορτελίνι 1kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Αλάτι ψιλό κουβά 12,5kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Αλάτι χοντρό no2 5kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Ρίγανη A' 0,5kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Πιπέρι κόκκινο γλυκό 1kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Σκόρδο σκόνη 1kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Μαύρο πιπέρι αλεσμένο 1kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Γάλα 3,5%", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Γάλα 1,5%", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Γαλατάκια μερίδας 7,3ml", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Εβαπορέ 410g", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Γάλα αμυγδάλου 1L", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Γάλα σόγιας 1L", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Γάλα καρύδας 1L", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Μείγμα για ζελέ γεύση ανανά 2kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Μείγμα για κρεμ καραμελέ 2kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Βανίλια σκόνη", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Γαρίφαλο σπυρί 1kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Σακούλες τσάντα 50cm", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Καπνιστό αλάτι", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Μπαχάρι σπυρί 1kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Ξύλο κανέλας", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Μοσχοκάρυδο τριμμένο", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Καπνιστή πάπρικα 1kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Μπουκοβο καυτερό 1kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Κρουτόν", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Μπαχάρι σκόνη 1kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Δάφνη", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Τσιμενί", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Μουστάρδα σκόνη", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Αστεροειδή γλυκάνισο", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Baking powder Κούβα 2kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Κόλιανδρο σκόνη 1kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Λάδια 10L", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Πιπεράκι τουρσί 5kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Ελιές Καλαμών 5kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Ελιές θρούμπα 5kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Ελιές πράσινες 5kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Ελιές ροδέλα Καλαμών 5kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Ελιές ροδέλα πράσινες 5kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Κάρι", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Κόλιανδρο σπυρί 1kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Σπυρί κόκκους πιπέρι", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Υγρό για πάτωμα κεράσι", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Κουρκουμάς", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Θυμάρι", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Βασιλικό", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Δεντρολίβανο", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}], "deleted": []}, {"id": "c1778690756412_4", "name": "Καφέδες", "products": [{"name": "Nestle cocoa beverage 1kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Nestle Dairy whitener powder low in fat 1kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Nescafé Intense 500gr", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://www.nestleprofessional.fr/sites/default/files/styles/np_product_detail/public/2023-12/nescafe-intense-poche-de-500g_0.png?itok=hmNeg0Ts"}, {"name": "Nescafé Classic Sticks", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTLkWg0NfX2Y8UxWKEWmp6Ipng59qv8u1OvLFUdUFFI5A&s=10"}, {"name": "Nescafé Intenso 1kg", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSjq5elPl62RExXgfCJVNOLToT3jr_BW8Gs4JzEOX-6w&s=10"}, {"name": "Nescafé Classic 550g", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwHpw8R_QTwXN5KSsdGArH79-5fwB5yonJCVzu35F51Q&s=10"}, {"name": "Λουμίδης Ελληνικός 981g", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-s23RetRMQPA4yiHAy-l2xrOPfAZsaqZSbgYN1PLpOQ&s=10"}, {"name": "Cafiza2", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqpfEEsuA-ah6DrlCreDQf4fVUtK8wvCzumvqPihipEQ&s=10"}, {"name": "Nescafé Classic Decaf 200g", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQme8_AelKUHDP-tJEQSd3BJ6CStnSgISwc6aMDLw9o2A&s=10"}, {"name": "Nestle ρόφημα σοκολάτας σκόνη 1kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Plantage Filter Coffee 488g", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_K4u7UaiCY2RMWvs4-uqpywxm_RtVXLAbJxj7kdcz8Q&s=10"}, {"name": "Buondi Decaffe φακελάκια", "boxes": 0, "sv": 0, "su": "pieces", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9E8cPW9e41XGz3ToDYnpI2dK3fAbcvD7FMVPinRvOFQ&s=10"}], "deleted": []}, {"id": "c1778690756412_5", "name": "BOSKOS", "products": [{"name": "Ελιές Καλαμών 5kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Ελιές πράσινες 5kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Ελιές ροδέλα Καλαμών 5kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Ελιές ροδέλα πράσινες 5kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Πιπεράκι τουρσί 5kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Μουστάρδα σκόνη", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Καπνιστή πάπρικα 1kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Αλάτι χοντρό 10kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Μοσχοκάρυδο τριμμένο", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Γαρίφαλο σπυρί 1kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Μπουκοβο καυτερό 1kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Κόλιανδρο σκόνη 1kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}, {"name": "Κόλιανδρο σπυρί 1kg", "boxes": 0, "sv": 0, "su": "pieces", "img": ""}], "deleted": []}];
+var EMBEDDED_DATA = [{"id":"c1778690756412_0","name":"Ιορδάνου","products":[{"name":"Κουτί πίτσας","boxes":0,"sv":0,"su":"pieces","img":"https://papabros.gr/wp-content/uploads/2024/01/KOUTI_PITSAS_KRAFT_WOOD_36%CE%A736%CE%A74_PAPABROS.jpg"},{"name":"Ξυλάκι γκολφ 12εκ","boxes":0,"sv":0,"su":"pieces","img":"https://sphoreca.gr/wp-content/uploads/2025/12/wp-image5157.jpg"},{"name":"Σκαφάκια craft","boxes":0,"sv":0,"su":"pieces","img":"https://olaproducts.gr/wp-content/uploads/2022/09/QB23_1-300x225.jpg.webp"},{"name":"Bowl στρογγυλό","boxes":0,"sv":0,"su":"pieces","img":"https://cdn.gmhoreca.gr/model/product_m/7281_d7bf90f571ed729988d401d1c2f6fd870a7449fb_image_1920.webp"},{"name":"Καπάκια για bowl στρογγυλό","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Bowl τετράγωνο","boxes":0,"sv":0,"su":"pieces","img":"https://thumbs.nmstore.gr/thumb/edetorakisv4/1920:webp/604799/products_upload/00045435_1.jpg"},{"name":"Καπάκια για bowl τετράγωνο","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Λαδόκολλα καφέ 20χ30","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOG96PCl0blk7iqw4knpWD_-BctM_fl4qLn_mTDMn9SA&s=10"},{"name":"Ρολό wypall κανάτα","boxes":0,"sv":0,"su":"pieces","img":"https://www.acpe.gr/products_img/1763201632_0_7260.jpg"},{"name":"Wrapmaster μεμβράνη 30cm x 300m","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Wrapmaster μεμβράνη 45cm x 300m","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Σακούλες για πάγο","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPOCJAAJC6egBzTUL5piM_edOZlJqhb3NdiKJi81UQjw&s=10"},{"name":"Σακούλες κόκκινες","boxes":0,"sv":0,"su":"pieces","img":"https://www.b2b-shop.gr/image/cache/catalog/proionta/spiti/eidi-katharismou/sakoules/sakoules-aporimatwn-aromtatikes-me-kordoni-homeex-72x95-set-10tem-5200126294979-3-1000x1000.png"},{"name":"Σακούλες μπλε","boxes":0,"sv":0,"su":"pieces","img":"https://kalamaras.gr/wp-content/uploads/2024/03/51409.jpg"},{"name":"Ρολό χάρτη 2χ4,5 kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Τραπεζομάντηλα","boxes":0,"sv":0,"su":"pieces","img":"https://xfood.gr/wp-content/uploads/2024/03/Xartino-Trapezomantilo-Maxi-1x1.3.jpg"},{"name":"Χαρτοπετσέτες","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSvrBHdfd7-22V6beLG5yELqj4CbdLlHr9_ktGTYRFafA&s=10"},{"name":"Ρολό βετεξ μπλε","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDzfweAwqKEKWPb1jeFYEqbFPmPh7gXl2RPLlCOB0h5A&s=10"},{"name":"Ρολό βετεξ κίτρινο","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHNkvm0yRVi5e3rfMS0U3r4O1_H_9H3Bmn_AiTUqPvxA&s=10"},{"name":"Σύρμα σπιράλ","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnIO0SQ14B6NETI3rhwqjq_0xVyh3w6SRZPkU42HYSEQ&s=10"},{"name":"Σφουγγάρια μεγάλα 14χ9","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQcFrJDwt8FkYrg53e_pN4B4-zz8Jic07Qr5y0U0nLvXA&s=10"},{"name":"Σφουγγάρι 10χ7χ3","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNQRyWxIv8mO4BC73HzEC_HiBYM3XYt6e9KCQjtPq2Xw&s=10"},{"name":"Μάπα *σφουγγαρίστρα μεγάλη","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Solid hero 4,5kg","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbXZMbQnn2uEF_DkP3DKUxYwFQpSwgrj9O9bbWWlm7Pg&s=10"},{"name":"Kichen pro duo 2L καθαριστικό για κουζίνα","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Clear dry hdp plus 5 L","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Regain 5L","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZbPTIEjn2LikkFhaVQy3-0niHuK1qo776HgAmF01dag&s=10"},{"name":"Χλωρίνη παχύρρευστη 5L","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLcHe5ZHirTV8ZFS-fIe2OMgD-7OAEGTDoaNYlLNZSRw&s=10"},{"name":"Assert fresh so 5L απορρυπαντικό για πλύσιμο πιάτων στο χέρι","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Assert fresh so 20kg απορρυπαντικό για πλύσιμο πιάτων στο χέρι","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Toprinse hd so στεγνωτικό πλυντήριο πιάτων 20kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Topmatic crystal so απορρυπαντικό για πλυντήριο 25kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Αεροζόλ για μηχανήματα","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Imi orange γενική καθαριστικό κουζίνας","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Kichen pro des special 2L απολυμαντικό επιφάνειας","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Greaselift 2L","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_GTKRn8enF-ou2C-djvdV73c-vk6lFvNVSfF21fsRMw&s=10"},{"name":"D-rinse plus στεγνωτικό πλυντήριο 5L","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Drop extra απορρυπαντικό πλυντηρίου 5L","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Γάντια μαύρα S","boxes":0,"sv":0,"su":"pieces","img":"https://www.emporico.gr/cdn/shop/files/gantia-nitriliou-mayra-sam.jpg?v=1773665490"},{"name":"Γάντια μαύρα M","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTp19cKXfVnaKv2T7J_dt1Aqg0fFBF4MHJY9t5G2g5ENA&s=10"},{"name":"Γάντια μαύρα L","boxes":0,"sv":0,"su":"pieces","img":"https://www.pharmacy1.gr/wp-content/uploads/2025/12/ALFASHIELD-GANTIA-NITRIL-BLACK-L-1.webp"},{"name":"Γάντια μαύρα Xl","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAQHUj8tvha-6vWsvOAKPuzMkvvRxBUuwmOLySJnTxjA&s=10"},{"name":"Γάντια με πούδρα Xl","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9RbSfqqTUUF3wX5EffDw0VppMQrUbtJK85WDKe3PftQ&s=10"},{"name":"Γάντια κόκκινα Μ","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXUSM4SWKjkau77TfZ_8f5xAFWJrw-hh9zqF7zdrk0Yg&s=10"},{"name":"Γάντια κόκκινα L","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXUSM4SWKjkau77TfZ_8f5xAFWJrw-hh9zqF7zdrk0Yg&s=10"},{"name":"Ποτήρι πλαστικό","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSz21wT3WMiM8MIp7n0H8nRRcWvdsJSZpWPhZboozz_0A&s=10"},{"name":"Καπάκια για ποτήρι πλαστικό","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Χάρτινο ποτήρι μεγάλο","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Καπάκια για χάρτινο ποτήρι μεγάλο","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Χάρτινο ποτήρι μεσαίο","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Καπάκι για χάρτινο ποτήρι μεσαίο","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Χάρτινο ποτήρι μικρό","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Καπάκι για χάρτινο ποτήρι μικρό","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Καλαμάκια χοντρά","boxes":0,"sv":0,"su":"pieces","img":"https://bizblend.gr/wp-content/uploads/2024/02/%CE%A3%CF%84%CE%B9%CE%B3%CE%BC%CE%B9%CF%8C%CF%84%CF%85%CF%80%CE%BF-%CE%BF%CE%B8%CF%8C%CE%BD%CE%B7%CF%82-2026-04-21-151306.png"},{"name":"Καλαμάκια για φραπέ","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Καλαμάκια για φρέντο","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Αναδευτήρες","boxes":0,"sv":0,"su":"pieces","img":"https://www.sixtyseconds.gr/datafiles/560.jpg"},{"name":"Ξυλάκι φιόγκος 12cm","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQUqL447u8UAIcgpGg1KFju4p2jwOdU2f6FwQnV2FJGcA&s=10"},{"name":"Μαχαιροπήρουνα","boxes":0,"sv":0,"su":"pieces","img":"https://bizblend.gr/wp-content/uploads/2024/01/3959736394.webp"},{"name":"Κουταλάκια για παγωτό","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Ταμπλέτες multi κουβάς","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDL7eElqb9t7lsIZXcfvAxT9JHKPJkwyuZKXm-Ui8gtw&s=10"},{"name":"Σοκ κουβάς","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRrrG9EvgmaR75L2npKtC3Nx1BK9cbmTzf-7mrkEvJUQ&s=10"},{"name":"Λαδόκολλα μεγάλη","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDspelUoSEgKQurbplJBCo_Rd6scOUUj18JA-1RdCeNA&s=10"},{"name":"Σκεύη για γιαούρτι","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Σκουπα","boxes":0,"sv":0,"su":"pieces","img":"https://www.sixtyseconds.gr/datafiles/838.jpg"},{"name":"Κοντάρι μικρο βιδομα","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Σφουγαριστρα","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Κονταρι μεγαλο βιδομα","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Κουβα για σφουγγαρίστρα","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Φαράσι","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJS7IHy1s262zM-R1S1KWuONrRYInU8xGu6B6bARhYsA&s=10"},{"name":"Κονταρι για φαρασι","boxes":0,"sv":0,"su":"pieces","img":""}],"deleted":[]},{"id":"c1778690756412_1","name":"Bikre ταβέρνα","products":[{"name":"Πατάτες fry'n dip","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnKCdEssXQls2qm6YWY0bES8lGwrLTldQrplAktuDygg&s=10"},{"name":"Γύρο χοιρινό","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTEs0t4_9tlSBkXCzcRpKR5duTHAR50nzw1-PWysTUrQQ&s=10"},{"name":"Γύρο κοτόπουλο","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZ1SlSVOxhCebmiZNziQavKDkC-JCFiyXG_Qh785u1ug&s=10"},{"name":"Σουβλάκι κοτόπουλο χειρ.100g","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Σουβλάκι χοιρινό χειρ.100g","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Σουβλακι κοτο-μπεικον","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Πανσέτα νωπή μ/ο","boxes":0,"sv":0,"su":"kg","img":""},{"name":"Σνίτσελ χοιρινό νωπό","boxes":0,"sv":0,"su":"kg","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSK6XhoNPTQsZHbPKI7ISwkQHtX8ph7duX1Y96f8PtcPg&s=10"},{"name":"Σνίτσελ κοτόπουλο νωπό","boxes":0,"sv":0,"su":"kg","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcStNleysp9LyunHQ4aQI0wk7zvhG5CH9V4YIvOYaEhHXQ&s=10"},{"name":"Σουτζουκάκια τύπου θασου 50g","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Παϊδάκια αρνίσια τεμάχια/να","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Μπριζόλα μοσχαρίσια Μ/Ο","boxes":0,"sv":0,"su":"kg","img":""},{"name":"Μπριζόλα χοιρινή Tomahawk Μ/Ο","boxes":0,"sv":0,"su":"kg","img":""},{"name":"Ψαρονέφρι","boxes":0,"sv":0,"su":"kg","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGHOlbpe-puGwISjdQRsjC_BN07GbNuAnz79CsZXPW3A&s=10"},{"name":"Κιμάς ανάμεικτος","boxes":0,"sv":0,"su":"kg","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ19nY51jS9yYIjrFrRn55ul3FBxXVAxLirEtBjkrAx3Q&s=10"},{"name":"Φιλέτο κοτόπουλο","boxes":0,"sv":0,"su":"kg","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlVYDjktMQrNeckVPOwDLGRsqSVYJ5Rlg6SXNFayUSVQ&s=10"}],"deleted":[]},{"id":"c1778690756412_2","name":"Thasos food taverna","products":[{"name":"Καλαμάρι","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBADIcWDChRyF7rp4NXFZEPmi0CwTkwd5W4mzFW_UGZw&s=10"},{"name":"Γαλέο","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Ξιφία","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Χταπόδι","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSi-vZAAaw7ajp7Z1im8KR47B66YnWpK9dvH_vxFNELww&s=10"},{"name":"Γαρίδες","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS26njB1MsGUwQPKvkGipfHL-jF_jw-FfCdJJbPYCtp3w&s=10"},{"name":"Κανταΐφι","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT6-7Lr_EeFAStLocYa8THzod0XkMDLc37EMnBSbHNr0g&s=10"},{"name":"Κασεροκροκέτες","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrMgwnuWoOluqXaOC_ZhmwZKJH6q6JARZe_lBTQY2xYQ&s=10"},{"name":"Πίτες","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU8AcQYthMl6iuT8NuwTn67Pa_xQ3jZM_gVar-0whdHQ&s=10"},{"name":"Πατάτες fry'n dip","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnKCdEssXQls2qm6YWY0bES8lGwrLTldQrplAktuDygg&s=10"}],"deleted":[]},{"id":"c1778690756412_3","name":"Thasosfood ξενοδοχείο ξηρά","products":[{"name":"Ξύδι 390ml","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROUN4fpQmuDS41lyhyXqTPzy0TjkwQEweWJNcr2kqXBw&s=10"},{"name":"Λεμόνι 370ml","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAkIb--Ql5UR2AtpRz3OTe7eQ346YT5sO1rcYg0PEibQ&s=10"},{"name":"Ξύδι 5L","boxes":0,"sv":0,"su":"pieces","img":"https://www.kore.gr/wp-content/uploads/2018/12/meteora-xidi-kokkino-5lt.jpg"},{"name":"Καστανή ζάχαρη 1kg","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRADXRMDjCeu19c79PQu60t8oAUQ3X4oj8YIDSCKIhKcw&s=10"},{"name":"Λευκή ζάχαρη 1kg","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSCVuTfk2cVsFw_A-48Z_36_a-hfG-362R7uv-nSZcpA&s=10"},{"name":"Ζάχαρη καστανή στικ","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQk4va8KtQJ11UWR3k2mUNSIH1XTw_hLybUcWKOJiq8eQ&s=10"},{"name":"Ζάχαρη λευκή στικ","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtt9G8109udvn7mPe_Oh6xd0WF54UNPSSU_E57M0N5zQ&s=10"},{"name":"Οδοντογλυφίδες","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMXDi3rg73ap3k1LoriHcg_W1BTTCwBa9iHul8ijCYZw&s=10"},{"name":"Στέβια στικ","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTitKy9yq3PEx11Cl-TYFLBPUfWjfExTqPbfXYlEPmNAg&s=10"},{"name":"Μέλι στικ","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTH6N4rGzCLIgLLv8OxevCQh9id-f7_Xx8wp9UqaU-CQ&s=10"},{"name":"Μέλι μερίδα","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Μέλι κουβά 5kg","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTffRQa7Mcg5sGjsIysWLqX-v_mdVzBfTBxUR9gGZo3Q&s=10"},{"name":"Μερέντα μερίδα","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKl2rOw5Dat3iU_vJUdeJwWpLtPQaO2-Ki78HtP_GExw&s=10"},{"name":"Μαρμελάδα ροδάκινο μερίδα","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Μαρμελάδα βερίκοκο","boxes":0,"sv":0,"su":"pieces","img":"https://www.coffees.gr/images/detailed/14/mel_appricot.jpg"},{"name":"Μαρμελάδα φράουλα μερίδα","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Μουστάρδα 4,2kg","boxes":0,"sv":0,"su":"pieces","img":"https://coffeeland.gr/wp-content/uploads/2024/08/26-003-700x700.png"},{"name":"Κέτσαπ 4,1kg","boxes":0,"sv":0,"su":"pieces","img":"https://megafrost.gr/cdn/shop/products/7250826231964_0.png?v=1695386658"},{"name":"Κετσαπ στικ","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWlFfn9BBOjhIBdDIQpVm-teAfoF-B4s2QOMRJVGIcEA&s=10"},{"name":"Μαγιονέζα στικ","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTWkOVcNIQ9m3rK8bYnr_pzn8Zfs1dboi9cWYLDkWxjzg&s=10"},{"name":"Μουστάρδα στικ","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSaBFADUk4sKfa5_kCgUmHjfG-N-rzJ4Ro-Cjva2TkkkA&s=10"},{"name":"Hellmann s μουστάρδα pouch 2,5kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Hellmann s μαγιονέζα pouch 2,5kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Hellman’s κέτσαπ pouch 2,5kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Πούλπα τομάτας 4100g","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSV00PH2uIhfXc-rOOyE9q17_P-mH_oaAo0cJOvg00Bfg&s=10"},{"name":"Τοματοπολτός 4500g","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSoQWsi_rU8G_A4smuHxg4e3Ob2dtHf4-pcvHq5FQsC0g&s"},{"name":"Κονκασέ 2500g","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSa1Z3EqJ2gWduGjqx2bO_gmFHQgzB1wJVTavc7pF85Kg&s"},{"name":"Πιπεριά κόκκινη ψητή 4100g","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQuEgOkjeKiQkfPc7I5IBjuSt_8yfdlKncMQxKZuI2JTw&s=10"},{"name":"Κρεμμυδάκια Στιφάδο 2000g","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4T-kQhbYoxk5eMCWjetOo5idD6nInchd3OuDFiq0Bsg&s=10"},{"name":"Ντολμαδάκια 2000g","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBEENyzAUMtcfQ5CYEbAmO7xoy9oM8PsHjisSOfS-HJA&s=10"},{"name":"Φασολάκια γίγας 2000g","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Κόκκινα φασόλια 2500g","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQd8YBLPG_r6_FpVOmRClUoztETazJdOAvvITHn3koSjA&s=10"},{"name":"Φασόλια μαγειρεμένα 2620g","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Μανιτάρια τεμαχισμένα 2450g","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwGoW75ro5wnmm5nQfW2Bo6JXPapJYFm8oeSpBXb93FQ&s=10"},{"name":"Μανιτάρια ολόκληρα 2500g","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Κομπόστα Φρουτοσαλάτα 2550g","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Κομπόστα αχλάδια μισοκομμένα 1500g","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Κομπόστα ροδέλες ανανά 3000g","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Κομπόστα ροδάκινα σε φέτες 2600g","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Μακαρόνια πέννες ριγέ","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Μακαρόνια τριβελάκι χρώμα","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Μακαρόνια τριβελάκι","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Μακαρόνια φιογκάκια","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Μακαρόνια κοφτό","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Μακαρόνια παστίτσιο","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Σπαγγέτι no6","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Μακαρόνια Λαζανάκι","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Κους κους","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Κριθαράκι μέτριο","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Knorr Σάλτσα Demi glace 1,2kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Knorr Σούπα τομάτα κρέμα 1kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Knorr ζωμός κότας σε πάστα 1,2 kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Knorr ζωμός βοδινού σε πάστα 1,2kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Knorr ζωμός λαχανικών σε σκόνη 1,25kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Knorr ζωμός λαχανικών σε πάστα 1,5kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Knorr σούπα μανιτάρι porcini κρέμα 850g","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Knorr Σάλτσα καρμπονάρα 1kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Knorr Green pepper sauce 1,2kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Knorr σάλτσα γλυκόξινη 2,2L","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Knorr σάλτσα σόγιας 1L","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Knorr σάλτσα μπάρμπεκιου 2,2L","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Knorr Σαλτσα τοματας 10kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Dee thai Chilli sauce 700ml","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Κρέμα βαλσαμικό 500ml","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Γλυκό κουταλιού σύκο 3kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Γλυκό κουταλιού βύσσινο 3kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Γλυκό κουταλιού πορτοκάλι 3kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Κορν φλάουρ 2,5kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Κριθαροκουλουρα 1kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Αγουράκι τουρσί 680g","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Κάπαρη 1000g","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Τόνος σε νερό 160g","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Καλαμπόκι σε άλμη 340g","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Μανιτάρια κομμένα 400g","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Αλεύρι γενικής χρήσης 1kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Φαρίνα 500g","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Ρύζι καρολίνα 5kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Ρύζι μπονέτ 5kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Ρύζι μπασμάτι 5kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"ρύζι άγριο μιξ 5kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Φακή ψιλή 500g","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Ρεβύθι χοντρό 500g","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Τορτελίνι 1kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Αλάτι ψιλό κουβά 12,5kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Αλάτι χοντρό no2 5kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Ρίγανη A' 0,5kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Πιπέρι κόκκινο γλυκό 1kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Σκόρδο σκόνη 1kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Μαύρο πιπέρι αλεσμένο 1kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Γάλα 3,5%","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Γάλα 1,5%","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Γαλατάκια μερίδας 7,3ml","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Εβαπορέ 410g","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Γάλα αμυγδάλου 1L","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Γάλα σόγιας 1L","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Γάλα καρύδας 1L","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Γάλα βρώμης 1Kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Μείγμα για ζελέ γεύση ανανά 2kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Μείγμα για κρεμ καραμελέ 2kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Βανίλια σκόνη","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Γαρίφαλο σπυρί 1kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Σακούλες τσάντα 50cm","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Καπνιστό αλάτι","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Μπαχάρι σπυρί 1kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Ξύλο κανέλας","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Μοσχοκάρυδο τριμμένο","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Καπνιστή πάπρικα 1kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Μπουκοβο καυτερό 1kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Κρουτόν","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Μπαχάρι σκόνη 1kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Δάφνη","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Τσιμενί","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Μουστάρδα σκόνη","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Αστεροειδή γλυκάνισο","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Baking powder Κούβα 2kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Κόλιανδρο σκόνη 1kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Λάδια 10L","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Πιπεράκι τουρσί 5kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Ελιές Καλαμών 5kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Ελιές θρούμπα 5kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Ελιές πράσινες 5kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Ελιές ροδέλα Καλαμών 5kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Ελιές ροδέλα πράσινες 5kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Κάρι","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Κόλιανδρο σπυρί 1kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Σπυρί κόκκους πιπέρι","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Υγρό για πάτωμα κεράσι","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Κουρκουμάς","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Θυμάρι","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Βασιλικό","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Δεντρολίβανο","boxes":0,"sv":0,"su":"pieces","img":""}],"deleted":[]},{"id":"c1778690756412_4","name":"Καφέδες","products":[{"name":"Nestle cocoa beverage 1kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Nestle Dairy whitener powder low in fat 1kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Nescafé Intense 500gr","boxes":0,"sv":0,"su":"pieces","img":"https://www.nestleprofessional.fr/sites/default/files/styles/np_product_detail/public/2023-12/nescafe-intense-poche-de-500g_0.png?itok=hmNeg0Ts"},{"name":"Nescafé Classic Sticks","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTLkWg0NfX2Y8UxWKEWmp6Ipng59qv8u1OvLFUdUFFI5A&s=10"},{"name":"Nescafé Intenso 1kg","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSjq5elPl62RExXgfCJVNOLToT3jr_BW8Gs4JzEOX-6w&s=10"},{"name":"Nescafé Classic 550g","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwHpw8R_QTwXN5KSsdGArH79-5fwB5yonJCVzu35F51Q&s=10"},{"name":"Λουμίδης Ελληνικός 981g","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-s23RetRMQPA4yiHAy-l2xrOPfAZsaqZSbgYN1PLpOQ&s=10"},{"name":"Cafiza2","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqpfEEsuA-ah6DrlCreDQf4fVUtK8wvCzumvqPihipEQ&s=10"},{"name":"Nescafé Classic Decaf 200g","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQme8_AelKUHDP-tJEQSd3BJ6CStnSgISwc6aMDLw9o2A&s=10"},{"name":"Nestle ρόφημα σοκολάτας σκόνη 1kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Plantage Filter Coffee 488g","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_K4u7UaiCY2RMWvs4-uqpywxm_RtVXLAbJxj7kdcz8Q&s=10"},{"name":"Buondi Decaffe φακελάκια","boxes":0,"sv":0,"su":"pieces","img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9E8cPW9e41XGz3ToDYnpI2dK3fAbcvD7FMVPinRvOFQ&s=10"}],"deleted":[]},{"id":"c1778690756412_5","name":"BOSKOS","products":[{"name":"Ελιές Καλαμών 5kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Ελιές πράσινες 5kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Ελιές ροδέλα Καλαμών 5kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Ελιές ροδέλα πράσινες 5kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Πιπεράκι τουρσί 5kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Μουστάρδα σκόνη","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Καπνιστή πάπρικα 1kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Αλάτι χοντρό 10kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Μοσχοκάρυδο τριμμένο","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Γαρίφαλο σπυρί 1kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Μπουκοβο καυτερό 1kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Κόλιανδρο σκόνη 1kg","boxes":0,"sv":0,"su":"pieces","img":""},{"name":"Κόλιανδρο σπυρί 1kg","boxes":0,"sv":0,"su":"pieces","img":""}],"deleted":[]}];
 // ════════════════════════════════════════════
 
 function esc(s){return String(s).replace(/[&<>"']/g,function(m){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m];});}
@@ -1088,7 +1097,7 @@ function openMod(id){q(id).classList.add('open');}
 function closeMod(id,e){if(!e||e.target.id===id)q(id).classList.remove('open');}
 function showToast(msg){var t=q('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2500);}
 
-var cats=[], orders=[], activeId=null, pendUnit=null, pendEdit=null, filterQty=false, filterFav=false, ovCtx=null, pendPhoto=null;
+var cats=[], orders=[], catalogTombstones=[], categoryTombstones=[], activeId=null, pendUnit=null, pendEdit=null, filterQty=false, filterFav=false, ovCtx=null, pendPhoto=null;
 window.__applyingRemote=false;
 /*
  * Storage key for persisting cart state.  The original file used
@@ -1103,15 +1112,7 @@ window.__applyingRemote=false;
 var SK='thassos_v10';
 
 /* ── Default data ── */
-var DEF=[
-  {name:'Ιορδάνου',ps:["Κουτί πίτσας","Ξυλάκι γκολφ 12εκ","Σκαφάκια craft","Bowl στρογγυλό","Bowl τετράγωνο","Λαδόκολλα καφέ 20χ30","Ρολό wypall κανάτα","Σακούλες για πάγο","Σακούλες κόκκινες","Σακούλες μπλε","Ρολό χάρτη 2χ4,5kg","Τραπεζομάντηλα","Χαρτοπετσέτες","Ρολό βετεξ μπλε","Ρολό βετεξ κίτρινο","Σύρμα σπιράλ","Σφουγγάρια μεγάλα 14χ9","Σφουγγάρι 10χ7χ3","Μάπα σφουγγαρίστρα","Solid hero 4,5kg","Kichen pro duo 2L","Clear dry hdp plus 5L","Regain 5L","Χλωρίνη παχύρρευστη 5L","Assert fresh so 5L","Assert fresh so 20kg","Toprinse hd so 20kg","Topmatic crystal so 25kg","Αεροζόλ μηχανημάτων","Imi orange γενική","Kichen pro des special 2L","Greaselift 2L","D-rinse plus 5L","Drop extra 5L","Γάντια μαύρα S","Γάντια μαύρα M","Γάντια μαύρα L","Γάντια μαύρα Xl","Γάντια με πούδρα Xl","Γάντια κόκκινα Μ","Γάντια κόκκινα L","Ποτήρι πλαστικό","Καπάκια ποτηριού","Χάρτινο ποτήρι μεγάλο","Καπάκια χάρτινου μεγάλου","Χάρτινο ποτήρι μεσαίο","Καπάκι χάρτινου μεσαίου","Χάρτινο ποτήρι μικρό","Καπάκι χάρτινου μικρού","Καλαμάκια χοντρά","Καλαμάκια φραπέ","Καλαμάκια φρέντο","Αναδευτήρες","Ξυλάκι φιόγκος 12cm","Μαχαιροπήρουνα","Κουταλάκια παγωτού","Ταμπλέτες multi κουβάς","Σοκ κουβάς","Λαδόκολλα μεγάλη","Σκεύη γιαουρτιού","Σκουπα","Κοντάρι μικρό","Σφουγγαρίστρα","Κουβάς σφουγγαρίστρας","Φαράσι","Κοντάρι φαρασιού"]},
-  {name:'Bikre ταβέρνα',ps:["Πατάτες fry'n dip","Γύρο χοιρινό","Γύρο κοτόπουλο","Σουβλάκι κοτόπουλο 100g","Σουβλάκι χοιρινό 100g","Σουβλάκι κοτό-μπέικον","Πανσέτα νωπή","Σνίτσελ χοιρινό","Σνίτσελ κοτόπουλο","Σουτζουκάκια 50g","Παϊδάκια αρνίσια","Μπριζόλα μοσχαρίσια","Μπριζόλα χοιρινή Tomahawk","Ψαρονέφρι","Κιμάς ανάμεικτος","Φιλέτο κοτόπουλο"]},
-  {name:'Thasos food taverna',ps:["Καλαμάρι","Γαλέος","Ξιφίας","Χταπόδι","Γαρίδες","Κανταΐφι","Κασεροκροκέτες","Πίτες","Πατάτες fry'n dip"]},
-  {name:'Thasosfood ξηρά',ps:["Ξύδι 390ml","Λεμόνι 370ml","Ξύδι 5L","Καστανή ζάχαρη 1kg","Λευκή ζάχαρη 1kg","Ζάχαρη καστανή στικ","Ζάχαρη λευκή στικ","Οδοντογλυφίδες","Στέβια στικ","Μέλι στικ","Μέλι κουβά 5kg","Μερέντα μερίδα","Μαρμελάδα ροδάκινο","Μαρμελάδα βερίκοκο","Μαρμελάδα φράουλα","Μουστάρδα 4,2kg","Κέτσαπ 4,1kg","Κετσαπ στικ","Μαγιονέζα στικ","Μουστάρδα στικ","Πούλπα τομάτας 4100g","Τοματοπολτός 4500g","Κονκασέ 2500g","Πιπεριά κόκκινη ψητή","Κρεμμυδάκια Στιφάδο","Ντολμαδάκια 2000g","Φασολάκια γίγας","Κόκκινα φασόλια 2500g","Φασόλια μαγειρεμένα","Μανιτάρια τεμαχισμένα","Μανιτάρια ολόκληρα","Κομπόστα Φρουτοσαλάτα","Κομπόστα αχλάδια","Κομπόστα ανανά","Κομπόστα ροδάκινα","Μακαρόνια πέννες","Μακαρόνια τριβελάκι","Μακαρόνια φιογκάκια","Μακαρόνια κοφτό","Μακαρόνια παστίτσιο","Σπαγγέτι no6","Μακαρόνια Λαζανάκι","Κους κους","Κριθαράκι μέτριο","Knorr Demi glace","Knorr Σούπα τομάτα","Knorr ζωμός κότας","Knorr ζωμός βοδινού","Knorr ζωμός λαχανικών σκόνη","Knorr ζωμός λαχανικών πάστα","Knorr σούπα μανιτάρι","Knorr σάλτσα σόγιας","Knorr σάλτσα μπάρμπεκιου","Knorr σάλτσα τομάτας 10kg","Dee thai Chilli sauce","Κρέμα βαλσαμικό","Γλυκό σύκο 3kg","Γλυκό βύσσινο 3kg","Γλυκό πορτοκάλι 3kg","Κορν φλάουρ 2,5kg","Κριθαροκουλουρα 1kg","Αγουράκι τουρσί","Κάπαρη 1000g","Τόνος σε νερό","Καλαμπόκι σε άλμη","Αλεύρι γενικής χρήσης","Ρύζι καρολίνα 5kg","Ρύζι μπονέτ 5kg","Ρύζι μπασμάτι 5kg","Φακή ψιλή","Ρεβύθι χοντρό","Τορτελίνι 1kg","Αλάτι ψιλό 12,5kg","Αλάτι χοντρό no2 5kg","Ρίγανη A'","Πιπέρι κόκκινο γλυκό","Σκόρδο σκόνη","Μαύρο πιπέρι αλεσμένο","Γάλα 3,5%","Γάλα 1,5%","Γαλατάκια μερίδας","Εβαπορέ 410g","Γάλα αμυγδάλου","Γάλα σόγιας","Γάλα καρύδας","Μείγμα ζελέ ανανά","Μείγμα κρεμ καραμελέ","Βανίλια σκόνη","Γαρίφαλο σπυρί","Καπνιστό αλάτι","Μπαχάρι σπυρί","Ξύλο κανέλας","Μοσχοκάρυδο τριμμένο","Καπνιστή πάπρικα","Μπουκοβο καυτερό","Κρουτόν","Δάφνη","Κάρι","Κουρκουμάς","Θυμάρι","Βασιλικό","Δεντρολίβανο","Λάδια 10L","Πιπεράκι τουρσί 5kg","Ελιές Καλαμών 5kg","Ελιές θρούμπα 5kg","Ελιές πράσινες 5kg","Ελιές ροδέλα Καλαμών","Ελιές ροδέλα πράσινες"]},
-  {name:'Καφέδες',ps:["Nestle cocoa 1kg","Nestle Dairy whitener 1kg","Nescafé Intense 500gr","Nescafé Classic Sticks","Nescafé Intenso 1kg","Nescafé Classic 550g","Λουμίδης Ελληνικός 981g","Cafiza2","Nescafé Classic Decaf 200g","Nestle ρόφημα σοκολάτας 1kg","Plantage Filter Coffee 488g","Buondi Decaffe φακελάκια"]},
-  {name:'BOSKOS',ps:["Ελιές Καλαμών 5kg","Ελιές πράσινες 5kg","Ελιές ροδέλα Καλαμών","Ελιές ροδέλα πράσινες","Πιπεράκι τουρσί 5kg","Καπνιστή πάπρικα 1kg","Αλάτι χοντρό 10kg","Μοσχοκάρυδο τριμμένο","Γαρίφαλο σπυρί 1kg","Μπουκοβο καυτερό 1kg","Κόλιανδρο σκόνη 1kg","Κόλιανδρο σπυρί 1kg"]}
-];
-
+var DEF=[{"name":"Ιορδάνου","ps":["Κουτί πίτσας","Ξυλάκι γκολφ 12εκ","Σκαφάκια craft","Bowl στρογγυλό","Καπάκια για bowl στρογγυλό","Bowl τετράγωνο","Καπάκια για bowl τετράγωνο","Λαδόκολλα καφέ 20χ30","Ρολό wypall κανάτα","Wrapmaster μεμβράνη 30cm x 300m","Wrapmaster μεμβράνη 45cm x 300m","Σακούλες για πάγο","Σακούλες κόκκινες","Σακούλες μπλε","Ρολό χάρτη 2χ4,5 kg","Τραπεζομάντηλα","Χαρτοπετσέτες","Ρολό βετεξ μπλε","Ρολό βετεξ κίτρινο","Σύρμα σπιράλ","Σφουγγάρια μεγάλα 14χ9","Σφουγγάρι 10χ7χ3","Μάπα *σφουγγαρίστρα μεγάλη","Solid hero 4,5kg","Kichen pro duo 2L καθαριστικό για κουζίνα","Clear dry hdp plus 5 L","Regain 5L","Χλωρίνη παχύρρευστη 5L","Assert fresh so 5L απορρυπαντικό για πλύσιμο πιάτων στο χέρι","Assert fresh so 20kg απορρυπαντικό για πλύσιμο πιάτων στο χέρι","Toprinse hd so στεγνωτικό πλυντήριο πιάτων 20kg","Topmatic crystal so απορρυπαντικό για πλυντήριο 25kg","Αεροζόλ για μηχανήματα","Imi orange γενική καθαριστικό κουζίνας","Kichen pro des special 2L απολυμαντικό επιφάνειας","Greaselift 2L","D-rinse plus στεγνωτικό πλυντήριο 5L","Drop extra απορρυπαντικό πλυντηρίου 5L","Γάντια μαύρα S","Γάντια μαύρα M","Γάντια μαύρα L","Γάντια μαύρα Xl","Γάντια με πούδρα Xl","Γάντια κόκκινα Μ","Γάντια κόκκινα L","Ποτήρι πλαστικό","Καπάκια για ποτήρι πλαστικό","Χάρτινο ποτήρι μεγάλο","Καπάκια για χάρτινο ποτήρι μεγάλο","Χάρτινο ποτήρι μεσαίο","Καπάκι για χάρτινο ποτήρι μεσαίο","Χάρτινο ποτήρι μικρό","Καπάκι για χάρτινο ποτήρι μικρό","Καλαμάκια χοντρά","Καλαμάκια για φραπέ","Καλαμάκια για φρέντο","Αναδευτήρες","Ξυλάκι φιόγκος 12cm","Μαχαιροπήρουνα","Κουταλάκια για παγωτό","Ταμπλέτες multi κουβάς","Σοκ κουβάς","Λαδόκολλα μεγάλη","Σκεύη για γιαούρτι","Σκουπα","Κοντάρι μικρο βιδομα","Σφουγαριστρα","Κονταρι μεγαλο βιδομα","Κουβα για σφουγγαρίστρα","Φαράσι","Κονταρι για φαρασι"]},{"name":"Bikre ταβέρνα","ps":["Πατάτες fry'n dip","Γύρο χοιρινό","Γύρο κοτόπουλο","Σουβλάκι κοτόπουλο χειρ.100g","Σουβλάκι χοιρινό χειρ.100g","Σουβλακι κοτο-μπεικον","Πανσέτα νωπή μ/ο","Σνίτσελ χοιρινό νωπό","Σνίτσελ κοτόπουλο νωπό","Σουτζουκάκια τύπου θασου 50g","Παϊδάκια αρνίσια τεμάχια/να","Μπριζόλα μοσχαρίσια Μ/Ο","Μπριζόλα χοιρινή Tomahawk Μ/Ο","Ψαρονέφρι","Κιμάς ανάμεικτος","Φιλέτο κοτόπουλο"]},{"name":"Thasos food taverna","ps":["Καλαμάρι","Γαλέο","Ξιφία","Χταπόδι","Γαρίδες","Κανταΐφι","Κασεροκροκέτες","Πίτες","Πατάτες fry'n dip"]},{"name":"Thasosfood ξενοδοχείο ξηρά","ps":["Ξύδι 390ml","Λεμόνι 370ml","Ξύδι 5L","Καστανή ζάχαρη 1kg","Λευκή ζάχαρη 1kg","Ζάχαρη καστανή στικ","Ζάχαρη λευκή στικ","Οδοντογλυφίδες","Στέβια στικ","Μέλι στικ","Μέλι μερίδα","Μέλι κουβά 5kg","Μερέντα μερίδα","Μαρμελάδα ροδάκινο μερίδα","Μαρμελάδα βερίκοκο","Μαρμελάδα φράουλα μερίδα","Μουστάρδα 4,2kg","Κέτσαπ 4,1kg","Κετσαπ στικ","Μαγιονέζα στικ","Μουστάρδα στικ","Hellmann s μουστάρδα pouch 2,5kg","Hellmann s μαγιονέζα pouch 2,5kg","Hellman’s κέτσαπ pouch 2,5kg","Πούλπα τομάτας 4100g","Τοματοπολτός 4500g","Κονκασέ 2500g","Πιπεριά κόκκινη ψητή 4100g","Κρεμμυδάκια Στιφάδο 2000g","Ντολμαδάκια 2000g","Φασολάκια γίγας 2000g","Κόκκινα φασόλια 2500g","Φασόλια μαγειρεμένα 2620g","Μανιτάρια τεμαχισμένα 2450g","Μανιτάρια ολόκληρα 2500g","Κομπόστα Φρουτοσαλάτα 2550g","Κομπόστα αχλάδια μισοκομμένα 1500g","Κομπόστα ροδέλες ανανά 3000g","Κομπόστα ροδάκινα σε φέτες 2600g","Μακαρόνια πέννες ριγέ","Μακαρόνια τριβελάκι χρώμα","Μακαρόνια τριβελάκι","Μακαρόνια φιογκάκια","Μακαρόνια κοφτό","Μακαρόνια παστίτσιο","Σπαγγέτι no6","Μακαρόνια Λαζανάκι","Κους κους","Κριθαράκι μέτριο","Knorr Σάλτσα Demi glace 1,2kg","Knorr Σούπα τομάτα κρέμα 1kg","Knorr ζωμός κότας σε πάστα 1,2 kg","Knorr ζωμός βοδινού σε πάστα 1,2kg","Knorr ζωμός λαχανικών σε σκόνη 1,25kg","Knorr ζωμός λαχανικών σε πάστα 1,5kg","Knorr σούπα μανιτάρι porcini κρέμα 850g","Knorr Σάλτσα καρμπονάρα 1kg","Knorr Green pepper sauce 1,2kg","Knorr σάλτσα γλυκόξινη 2,2L","Knorr σάλτσα σόγιας 1L","Knorr σάλτσα μπάρμπεκιου 2,2L","Knorr Σαλτσα τοματας 10kg","Dee thai Chilli sauce 700ml","Κρέμα βαλσαμικό 500ml","Γλυκό κουταλιού σύκο 3kg","Γλυκό κουταλιού βύσσινο 3kg","Γλυκό κουταλιού πορτοκάλι 3kg","Κορν φλάουρ 2,5kg","Κριθαροκουλουρα 1kg","Αγουράκι τουρσί 680g","Κάπαρη 1000g","Τόνος σε νερό 160g","Καλαμπόκι σε άλμη 340g","Μανιτάρια κομμένα 400g","Αλεύρι γενικής χρήσης 1kg","Φαρίνα 500g","Ρύζι καρολίνα 5kg","Ρύζι μπονέτ 5kg","Ρύζι μπασμάτι 5kg","ρύζι άγριο μιξ 5kg","Φακή ψιλή 500g","Ρεβύθι χοντρό 500g","Τορτελίνι 1kg","Αλάτι ψιλό κουβά 12,5kg","Αλάτι χοντρό no2 5kg","Ρίγανη A' 0,5kg","Πιπέρι κόκκινο γλυκό 1kg","Σκόρδο σκόνη 1kg","Μαύρο πιπέρι αλεσμένο 1kg","Γάλα 3,5%","Γάλα 1,5%","Γαλατάκια μερίδας 7,3ml","Εβαπορέ 410g","Γάλα αμυγδάλου 1L","Γάλα σόγιας 1L","Γάλα καρύδας 1L","Γάλα βρώμης 1Kg","Μείγμα για ζελέ γεύση ανανά 2kg","Μείγμα για κρεμ καραμελέ 2kg","Βανίλια σκόνη","Γαρίφαλο σπυρί 1kg","Σακούλες τσάντα 50cm","Καπνιστό αλάτι","Μπαχάρι σπυρί 1kg","Ξύλο κανέλας","Μοσχοκάρυδο τριμμένο","Καπνιστή πάπρικα 1kg","Μπουκοβο καυτερό 1kg","Κρουτόν","Μπαχάρι σκόνη 1kg","Δάφνη","Τσιμενί","Μουστάρδα σκόνη","Αστεροειδή γλυκάνισο","Baking powder Κούβα 2kg","Κόλιανδρο σκόνη 1kg","Λάδια 10L","Πιπεράκι τουρσί 5kg","Ελιές Καλαμών 5kg","Ελιές θρούμπα 5kg","Ελιές πράσινες 5kg","Ελιές ροδέλα Καλαμών 5kg","Ελιές ροδέλα πράσινες 5kg","Κάρι","Κόλιανδρο σπυρί 1kg","Σπυρί κόκκους πιπέρι","Υγρό για πάτωμα κεράσι","Κουρκουμάς","Θυμάρι","Βασιλικό","Δεντρολίβανο"]},{"name":"Καφέδες","ps":["Nestle cocoa beverage 1kg","Nestle Dairy whitener powder low in fat 1kg","Nescafé Intense 500gr","Nescafé Classic Sticks","Nescafé Intenso 1kg","Nescafé Classic 550g","Λουμίδης Ελληνικός 981g","Cafiza2","Nescafé Classic Decaf 200g","Nestle ρόφημα σοκολάτας σκόνη 1kg","Plantage Filter Coffee 488g","Buondi Decaffe φακελάκια"]},{"name":"BOSKOS","ps":["Ελιές Καλαμών 5kg","Ελιές πράσινες 5kg","Ελιές ροδέλα Καλαμών 5kg","Ελιές ροδέλα πράσινες 5kg","Πιπεράκι τουρσί 5kg","Μουστάρδα σκόνη","Καπνιστή πάπρικα 1kg","Αλάτι χοντρό 10kg","Μοσχοκάρυδο τριμμένο","Γαρίφαλο σπυρί 1kg","Μπουκοβο καυτερό 1kg","Κόλιανδρο σκόνη 1kg","Κόλιανδρο σπυρί 1kg"]}];
 /*
  * Additional products that are present in the original default lists but
  * missing from this file. When the application loads, the mergeMissing()
@@ -1222,6 +1223,245 @@ var MISSING_BY_NAME={
   ]
 };
 
+
+/* ── Πλήρης κατάλογος προϊόντων (από το αποθηκευμένο αρχείο 2026-08-07) ──
+   Ο κατάλογος συγχωνεύεται με τα υπάρχοντα Firebase δεδομένα:
+   - δεν χάνονται ποσότητες / φωτογραφίες / αγαπημένα
+   - δεν διαγράφονται χειροκίνητα προϊόντα
+   - όσα λείπουν προστίθενται αυτόματα
+   - παλιές ονομασίες μετατρέπονται στις νεότερες για να αποφεύγονται διπλότυπα
+*/
+var MASTER_CATEGORY_ALIASES={"Thasosfood ξηρά":"Thasosfood ξενοδοχείο ξηρά"};
+var MASTER_PRODUCT_ALIASES={"Ιορδάνου":{"Ρολό χάρτη 2χ4,5kg":"Ρολό χάρτη 2χ4,5 kg","Clear dry hdp plus 5L":"Clear dry hdp plus 5 L","Σφουγγαρίστρα":"Σφουγαριστρα","Καλαμάκια φρέντο":"Καλαμάκια για φρέντο","Καλαμάκια φραπέ":"Καλαμάκια για φραπέ","Κουταλάκια παγωτού":"Κουταλάκια για παγωτό","Κουβάς σφουγγαρίστρας":"Κουβα για σφουγγαρίστρα","Μάπα σφουγγαρίστρα":"Μάπα *σφουγγαρίστρα μεγάλη","Αεροζόλ μηχανημάτων":"Αεροζόλ για μηχανήματα","Κοντάρι φαρασιού":"Κονταρι για φαρασι","Σκεύη γιαουρτιού":"Σκεύη για γιαούρτι","Κοντάρι μικρό":"Κοντάρι μικρο βιδομα","Καπάκια χάρτινου μεγάλου":"Καπάκια για χάρτινο ποτήρι μεγάλο","Καπάκι χάρτινου μεσαίου":"Καπάκι για χάρτινο ποτήρι μεσαίο","Καπάκι χάρτινου μικρού":"Καπάκι για χάρτινο ποτήρι μικρό","Καπάκια ποτηριού":"Καπάκια για ποτήρι πλαστικό","Kichen pro des special 2L":"Kichen pro des special 2L απολυμαντικό επιφάνειας","Topmatic crystal so 25kg":"Topmatic crystal so απορρυπαντικό για πλυντήριο 25kg","Imi orange γενική":"Imi orange γενική καθαριστικό κουζίνας","Kichen pro duo 2L":"Kichen pro duo 2L καθαριστικό για κουζίνα","Toprinse hd so 20kg":"Toprinse hd so στεγνωτικό πλυντήριο πιάτων 20kg","D-rinse plus 5L":"D-rinse plus στεγνωτικό πλυντήριο 5L","Drop extra 5L":"Drop extra απορρυπαντικό πλυντηρίου 5L","Assert fresh so 20kg":"Assert fresh so 20kg απορρυπαντικό για πλύσιμο πιάτων στο χέρι","Assert fresh so 5L":"Assert fresh so 5L απορρυπαντικό για πλύσιμο πιάτων στο χέρι"},"Bikre ταβέρνα":{"Σουβλάκι κοτό-μπέικον":"Σουβλακι κοτο-μπεικον","Μπριζόλα χοιρινή Tomahawk":"Μπριζόλα χοιρινή Tomahawk Μ/Ο","Μπριζόλα μοσχαρίσια":"Μπριζόλα μοσχαρίσια Μ/Ο","Πανσέτα νωπή":"Πανσέτα νωπή μ/ο","Σουβλάκι κοτόπουλο 100g":"Σουβλάκι κοτόπουλο χειρ.100g","Σουβλάκι χοιρινό 100g":"Σουβλάκι χοιρινό χειρ.100g","Σνίτσελ κοτόπουλο":"Σνίτσελ κοτόπουλο νωπό","Σνίτσελ χοιρινό":"Σνίτσελ χοιρινό νωπό","Παϊδάκια αρνίσια":"Παϊδάκια αρνίσια τεμάχια/να","Σουτζουκάκια 50g":"Σουτζουκάκια τύπου θασου 50g"},"Thasos food taverna":{"Ξιφίας":"Ξιφία","Γαλέος":"Γαλέο"},"Thasosfood ξενοδοχείο ξηρά":{"Knorr σάλτσα τομάτας 10kg":"Knorr Σαλτσα τοματας 10kg","Knorr σάλτσα σόγιας":"Knorr σάλτσα σόγιας 1L","Knorr σάλτσα μπάρμπεκιου":"Knorr σάλτσα μπάρμπεκιου 2,2L","Γάλα αμυγδάλου":"Γάλα αμυγδάλου 1L","Ελιές ροδέλα πράσινες":"Ελιές ροδέλα πράσινες 5kg","Μαύρο πιπέρι αλεσμένο":"Μαύρο πιπέρι αλεσμένο 1kg","Αλεύρι γενικής χρήσης":"Αλεύρι γενικής χρήσης 1kg","Ελιές ροδέλα Καλαμών":"Ελιές ροδέλα Καλαμών 5kg","Πιπέρι κόκκινο γλυκό":"Πιπέρι κόκκινο γλυκό 1kg","Γάλα καρύδας":"Γάλα καρύδας 1L","Μπουκοβο καυτερό":"Μπουκοβο καυτερό 1kg","Καπνιστή πάπρικα":"Καπνιστή πάπρικα 1kg","Γάλα σόγιας":"Γάλα σόγιας 1L","Γαρίφαλο σπυρί":"Γαρίφαλο σπυρί 1kg","Μπαχάρι σπυρί":"Μπαχάρι σπυρί 1kg","Γαλατάκια μερίδας":"Γαλατάκια μερίδας 7,3ml","Knorr ζωμός λαχανικών πάστα":"Knorr ζωμός λαχανικών σε πάστα 1,5kg","Κομπόστα Φρουτοσαλάτα":"Κομπόστα Φρουτοσαλάτα 2550g","Μανιτάρια τεμαχισμένα":"Μανιτάρια τεμαχισμένα 2450g","Καλαμπόκι σε άλμη":"Καλαμπόκι σε άλμη 340g","Μακαρόνια πέννες":"Μακαρόνια πέννες ριγέ","Σκόρδο σκόνη":"Σκόρδο σκόνη 1kg","Dee thai Chilli sauce":"Dee thai Chilli sauce 700ml","Φασόλια μαγειρεμένα":"Φασόλια μαγειρεμένα 2620g","Κρεμμυδάκια Στιφάδο":"Κρεμμυδάκια Στιφάδο 2000g","Πιπεριά κόκκινη ψητή":"Πιπεριά κόκκινη ψητή 4100g","Αγουράκι τουρσί":"Αγουράκι τουρσί 680g","Knorr ζωμός λαχανικών σκόνη":"Knorr ζωμός λαχανικών σε σκόνη 1,25kg","Μανιτάρια ολόκληρα":"Μανιτάρια ολόκληρα 2500g","Μείγμα κρεμ καραμελέ":"Μείγμα για κρεμ καραμελέ 2kg","Ρεβύθι χοντρό":"Ρεβύθι χοντρό 500g","Μαρμελάδα ροδάκινο":"Μαρμελάδα ροδάκινο μερίδα","Αλάτι ψιλό 12,5kg":"Αλάτι ψιλό κουβά 12,5kg","Κρέμα βαλσαμικό":"Κρέμα βαλσαμικό 500ml","Φασολάκια γίγας":"Φασολάκια γίγας 2000g","Τόνος σε νερό":"Τόνος σε νερό 160g","Μαρμελάδα φράουλα":"Μαρμελάδα φράουλα μερίδα","Φακή ψιλή":"Φακή ψιλή 500g","Knorr Σούπα τομάτα":"Knorr Σούπα τομάτα κρέμα 1kg","Γλυκό πορτοκάλι 3kg":"Γλυκό κουταλιού πορτοκάλι 3kg","Ρίγανη A'":"Ρίγανη A' 0,5kg","Γλυκό βύσσινο 3kg":"Γλυκό κουταλιού βύσσινο 3kg","Knorr ζωμός βοδινού":"Knorr ζωμός βοδινού σε πάστα 1,2kg","Knorr Demi glace":"Knorr Σάλτσα Demi glace 1,2kg","Μείγμα ζελέ ανανά":"Μείγμα για ζελέ γεύση ανανά 2kg","Knorr ζωμός κότας":"Knorr ζωμός κότας σε πάστα 1,2 kg","Γλυκό σύκο 3kg":"Γλυκό κουταλιού σύκο 3kg","Κομπόστα ροδάκινα":"Κομπόστα ροδάκινα σε φέτες 2600g","Knorr σούπα μανιτάρι":"Knorr σούπα μανιτάρι porcini κρέμα 850g","Κομπόστα ανανά":"Κομπόστα ροδέλες ανανά 3000g","Κομπόστα αχλάδια":"Κομπόστα αχλάδια μισοκομμένα 1500g"},"Καφέδες":{"Nestle ρόφημα σοκολάτας 1kg":"Nestle ρόφημα σοκολάτας σκόνη 1kg","Nestle cocoa 1kg":"Nestle cocoa beverage 1kg","Nestle Dairy whitener 1kg":"Nestle Dairy whitener powder low in fat 1kg"},"BOSKOS":{"Ελιές ροδέλα πράσινες":"Ελιές ροδέλα πράσινες 5kg","Ελιές ροδέλα Καλαμών":"Ελιές ροδέλα Καλαμών 5kg"}};
+
+function masterNameKey(s){
+  return String(s||'').toLocaleLowerCase('el-GR')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/ς/g,'σ').replace(/[^a-z0-9α-ω]+/g,'');
+}
+function productUnitKey(p){
+  return String((p&&p.su)||'pieces').toLowerCase();
+}
+/* Duplicate matching uses the COMPLETE product description.
+   Packaging/size is part of the identity: e.g. "Κόλα 1L" and "Κόλα 500ml"
+   are different products. We only normalize cosmetic differences such as
+   case, accents, decimal comma/dot and spacing around common measurements. */
+function duplicateNameKey(name){
+  var t=greeklishToGreek(String(name||'').toLowerCase());
+  t=t.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ς/g,'σ');
+  t=t.replace(/,/g,'.');
+  t=t.replace(/\s+/g,' ').trim();
+  t=t.replace(/\s*([xχ×])\s*/g,'x');
+  t=t.replace(/(\d)\s+(kg|gr|g|ml|lt|l|cm|mm|εκ)\b/gi,'$1$2');
+  return t;
+}
+function productIdentityKeyFrom(name,unit){
+  return duplicateNameKey(name)+'|'+String(unit||'pieces').toLowerCase();
+}
+function productIdentityKey(p){
+  return productIdentityKeyFrom(p&&p.name,productUnitKey(p));
+}
+/* Firebase tombstones: κρατούν τις επιλογές του χρήστη μόνιμες.
+   Έτσι ένα προϊόν που διαγράφηκε οριστικά ή μετονομάστηκε δεν ξαναμπαίνει
+   από τον ενσωματωμένο αρχικό κατάλογο σε επόμενο άνοιγμα. */
+function categoryIdentityKey(name){return masterNameKey(name);}
+function productTombstoneKey(categoryName,p){return categoryIdentityKey(categoryName)+'::'+productIdentityKey(p);}
+function hasProductTombstone(categoryName,p){return catalogTombstones.indexOf(productTombstoneKey(categoryName,p))>=0;}
+function addProductTombstone(categoryName,p){
+  var k=productTombstoneKey(categoryName,p);
+  if(catalogTombstones.indexOf(k)<0)catalogTombstones.push(k);
+}
+function clearProductTombstone(categoryName,p){
+  var k=productTombstoneKey(categoryName,p);
+  catalogTombstones=catalogTombstones.filter(function(x){return x!==k;});
+}
+function hasCategoryTombstone(name){return categoryTombstones.indexOf(categoryIdentityKey(name))>=0;}
+function addCategoryTombstone(name){var k=categoryIdentityKey(name);if(categoryTombstones.indexOf(k)<0)categoryTombstones.push(k);}
+function clearCategoryTombstone(name){var k=categoryIdentityKey(name);categoryTombstones=categoryTombstones.filter(function(x){return x!==k;});}
+function unitLabel(u){
+  return ({pieces:'Τεμάχια',kg:'Κιλά',pallet:'Παλέτα'})[u]||'Τεμάχια';
+}
+/* Αφαιρεί μόνο ΠΡΑΓΜΑΤΙΚΑ διπλότυπα μέσα στην ΙΔΙΑ κατηγορία.
+   Πρέπει να ταιριάζει ΟΛΟΚΛΗΡΗ η περιγραφή (μαζί με μέγεθος/συσκευασία) + η μονάδα αποθέματος.
+   Παράδειγμα: Κόλα 1L != Κόλα 500ml, άρα μένουν και τα δύο.
+   Επίσης ίδιο πλήρες όνομα με διαφορετική μονάδα αποθέματος (Τεμάχια / Κιλά) μένει και στις δύο μορφές. */
+function cleanupDuplicateProducts(){
+  var changed=false;
+  cats.forEach(function(c){
+    ['products','deleted'].forEach(function(field){
+      var list=Array.isArray(c[field])?c[field]:[];
+      var seen={},dedup=[];
+      list.forEach(function(p){
+        var k=productIdentityKey(p);
+        if(!seen[k]){
+          seen[k]=p;dedup.push(p);
+        }else{
+          mergeProductValues(seen[k],p);
+          changed=true;
+        }
+      });
+      if(dedup.length!==list.length)c[field]=dedup;
+    });
+  });
+  return changed;
+}
+function mergeProductValues(target,source){
+  if(!target||!source)return;
+  if(!(target.boxes>0)&&source.boxes>0)target.boxes=source.boxes;
+  if(!(target.sv>0)&&source.sv>0)target.sv=source.sv;
+  if((!target.su||target.su==='pieces')&&source.su&&source.su!=='pieces')target.su=source.su;
+  if(!target.img&&source.img)target.img=source.img;
+  if(!target.imgPath&&source.imgPath)target.imgPath=source.imgPath;
+  target.fav=!!(target.fav||source.fav);
+}
+function normalizeMasterProduct(mp,cid){
+  var p=JSON.parse(JSON.stringify(mp||{}));
+  if(!p.name)p.name='Προϊόν';
+  if(!p.id)p.id=stableProductId(cid,p.name);
+  if(p.boxes===undefined)p.boxes=0;
+  if(p.sv===undefined)p.sv=0;
+  if(!p.su)p.su='pieces';
+  if(!p.img)p.img='';
+  if(!p.imgPath)p.imgPath='';
+  p.fav=!!p.fav;
+  return p;
+}
+
+/* ===== ONE-TIME CATALOG UPDATE: 8 NEW PRODUCTS + 1 CORRECTION (2026-08-07) =====
+   Προσθέτει μόνο τα 8 νέα προϊόντα που παραμένουν στην κατηγορία
+   "Thasosfood ξενοδοχείο ξηρά". Έτσι μια παλιότερη Firebase κατάσταση
+   αναβαθμίζεται μία φορά χωρίς να επαναφέρει άλλα προϊόντα που μπορεί
+   να έχουν διαγραφεί σκόπιμα. */
+var CATALOG_PATCH_VERSION=2026080704;
+var CATALOG_ADDITIONS_20260807={"Thasosfood ξενοδοχείο ξηρά":["Knorr Σάλτσα καρμπονάρα 1kg","Knorr Green pepper sauce 1,2kg","ρύζι άγριο μιξ 5kg","Knorr σάλτσα γλυκόξινη 2,2L","Γάλα βρώμης 1Kg","Hellmann s μουστάρδα pouch 2,5kg","Hellmann s μαγιονέζα pouch 2,5kg","Hellman’s κέτσαπ pouch 2,5kg"]};
+// Διόρθωση: αφαιρεί μόνο το κατά λάθος νέο προϊόν χωρίς συσκευασία.
+var CATALOG_REMOVALS_20260807={"Thasosfood ξενοδοχείο ξηρά":["Knorr Σούπα μανιτάρι Porcini κρέμα"]};
+var loadedCatalogVersion=0;
+
+function findCatalogCategory(name){
+  var c=cats.find(function(x){return x.name===name;});
+  if(c)return c;
+  Object.keys(MASTER_CATEGORY_ALIASES||{}).some(function(oldName){
+    if(MASTER_CATEGORY_ALIASES[oldName]===name){
+      var oldCat=cats.find(function(x){return x.name===oldName;});
+      if(oldCat){oldCat.name=name;c=oldCat;return true;}
+    }
+    return false;
+  });
+  return c||null;
+}
+function masterProductByName(categoryName,productName){
+  var mc=(EMBEDDED_DATA||[]).find(function(x){return x.name===categoryName;});
+  return mc ? (mc.products||[]).find(function(p){return p.name===productName;}) : null;
+}
+function applyCatalogPatch20260807(forceVersion){
+  var stateVersion=Number(forceVersion===undefined?loadedCatalogVersion:forceVersion)||0;
+  if(stateVersion>=CATALOG_PATCH_VERSION){loadedCatalogVersion=stateVersion;return false;}
+  var changed=false;
+  // Πρώτα εφαρμόζουμε διορθώσεις καταλόγου. Αυτό αφαιρεί μόνο τις ακριβείς
+  // καταχωρίσεις που δηλώνονται παρακάτω, όχι παρόμοια προϊόντα ή άλλες συσκευασίες.
+  Object.keys(CATALOG_REMOVALS_20260807||{}).forEach(function(categoryName){
+    var c=findCatalogCategory(categoryName);
+    if(!c)return;
+    (CATALOG_REMOVALS_20260807[categoryName]||[]).forEach(function(productName){
+      var exactKey=duplicateNameKey(productName);
+      ['products','deleted'].forEach(function(field){
+        if(!Array.isArray(c[field]))return;
+        var before=c[field].length;
+        c[field]=c[field].filter(function(p){return duplicateNameKey(p&&p.name)!==exactKey;});
+        if(c[field].length!==before)changed=true;
+      });
+    });
+  });
+  Object.keys(CATALOG_ADDITIONS_20260807).forEach(function(categoryName){
+    var c=findCatalogCategory(categoryName);
+    if(!c){
+      var mc=(EMBEDDED_DATA||[]).find(function(x){return x.name===categoryName;});
+      if(!mc)return;
+      c={id:mc.id||('c'+Date.now()+'_'+Math.random().toString(36).slice(2,7)),name:categoryName,products:[],deleted:[]};
+      cats.push(c);changed=true;
+    }
+    if(!Array.isArray(c.products))c.products=[];
+    if(!Array.isArray(c.deleted))c.deleted=[];
+    CATALOG_ADDITIONS_20260807[categoryName].forEach(function(productName){
+      var key=masterNameKey(productName);
+      var mp=masterProductByName(categoryName,productName)||{name:productName,boxes:0,sv:0,su:'pieces',img:''};
+      var wantedUnit=productUnitKey(mp);
+      if(c.products.some(function(p){return masterNameKey(p.name)===key && productUnitKey(p)===wantedUnit;}))return;
+      // If an older copy is sitting in Deleted, restore only the same name + same unit.
+      var di=c.deleted.findIndex(function(p){return masterNameKey(p.name)===key && productUnitKey(p)===wantedUnit;});
+      if(di>=0){
+        c.products.push(c.deleted.splice(di,1)[0]);
+      }else{
+        c.products.push(normalizeMasterProduct(mp,c.id));
+      }
+      changed=true;
+    });
+  });
+  loadedCatalogVersion=CATALOG_PATCH_VERSION;
+  normalizeCatsData(cats);
+  return changed;
+}
+/* ===== END CATALOG UPDATE ===== */
+function mergeMasterCatalog(){
+  if(!Array.isArray(EMBEDDED_DATA)||!EMBEDDED_DATA.length)return false;
+  var changed=false;
+  EMBEDDED_DATA.forEach(function(mc){
+    if(hasCategoryTombstone(mc.name))return;
+    var c=cats.find(function(x){return x.name===mc.name;});
+    if(!c){
+      Object.keys(MASTER_CATEGORY_ALIASES).some(function(oldName){
+        if(MASTER_CATEGORY_ALIASES[oldName]===mc.name){
+          var oldCat=cats.find(function(x){return x.name===oldName;});
+          if(oldCat){c=oldCat;c.name=mc.name;changed=true;return true;}
+        }
+        return false;
+      });
+    }
+    if(!c){
+      c={id:mc.id||('c'+Date.now()+'_'+Math.random().toString(36).slice(2,7)),name:mc.name,products:[],deleted:[]};
+      cats.push(c);changed=true;
+    }
+    if(!Array.isArray(c.products))c.products=[];
+    if(!Array.isArray(c.deleted))c.deleted=[];
+
+    var aliases=MASTER_PRODUCT_ALIASES[mc.name]||{};
+    [c.products,c.deleted].forEach(function(list){
+      list.forEach(function(p){
+        if(aliases[p.name]&&aliases[p.name]!==p.name){
+          p.name=aliases[p.name];changed=true;
+        }
+      });
+      var seen={},dedup=[];
+      list.forEach(function(p){
+        var k=productIdentityKey(p);
+        if(!seen[k]){seen[k]=p;dedup.push(p);}
+        else{mergeProductValues(seen[k],p);changed=true;}
+      });
+      if(dedup.length!==list.length){
+        list.length=0;dedup.forEach(function(p){list.push(p);});
+      }
+    });
+
+    (mc.products||[]).forEach(function(mp){
+      var normalizedMp=normalizeMasterProduct(mp,c.id);
+      if(hasProductTombstone(mc.name,normalizedMp))return;
+      var key=masterNameKey(mp.name);
+      var wantedUnit=productUnitKey(mp);
+      var existing=c.products.find(function(p){return masterNameKey(p.name)===key && productUnitKey(p)===wantedUnit;});
+      var isDeleted=c.deleted.some(function(p){return masterNameKey(p.name)===key && productUnitKey(p)===wantedUnit;});
+      if(existing){
+        if(!existing.img&&mp.img){existing.img=mp.img;changed=true;}
+      }else if(!isDeleted){
+        c.products.push(normalizeMasterProduct(mp,c.id));
+        changed=true;
+      }
+    });
+  });
+  normalizeCatsData(cats);
+  return changed;
+}
+
 // Merge missing products into existing categories. If a product with the same
 // name already exists it will not be added. New products are appended at
 // the end of each category's product list with zero quantities and no image.
@@ -1233,19 +1473,21 @@ function mergeMissing(){
       // Check by name (exact match)
       var exists=c.products.some(function(p){return p.name===mi.name;});
       if(!exists){
-        c.products.push({
-          name: mi.name,
-          boxes: 0,
-          sv: 0,
-          su: mi.su || 'pieces',
-          img: ''
-        });
+        var np=mkP(mi.name);
+        np.su=mi.su||'pieces';
+        c.products.push(np);
       }
     });
   });
 }
 
-function mkP(name){return{name:name,boxes:0,sv:0,su:'pieces',img:'',fav:false};}
+function newProductId(){return'p'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8);}
+function stableProductId(cid,name){
+  var str=String(cid||'')+'|'+String(name||'');var h=2166136261;
+  for(var i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619);}
+  return'p_'+(h>>>0).toString(36);
+}
+function mkP(name){return{id:newProductId(),name:name,boxes:0,sv:0,su:'pieces',img:'',imgPath:'',fav:false};}
 
 function initCats(){
   cats=DEF.map(function(d,i){
@@ -1260,7 +1502,18 @@ function normalizeCatsData(list){
     if(!Array.isArray(c.products))c.products=[];
     if(!Array.isArray(c.deleted))c.deleted=[];
     c.products.forEach(function(p){
+      if(!p.id)p.id=stableProductId(c.id,p.name);
       if(!p.img)p.img='';
+      if(!p.imgPath)p.imgPath='';
+      if(p.sv===undefined)p.sv=0;
+      if(p.boxes===undefined)p.boxes=0;
+      if(!p.su)p.su='pieces';
+      p.fav=!!p.fav;
+    });
+    c.deleted.forEach(function(p){
+      if(!p.id)p.id=stableProductId(c.id,p.name);
+      if(!p.img)p.img='';
+      if(!p.imgPath)p.imgPath='';
       if(p.sv===undefined)p.sv=0;
       if(p.boxes===undefined)p.boxes=0;
       if(!p.su)p.su='pieces';
@@ -1270,11 +1523,11 @@ function normalizeCatsData(list){
   return list;
 }
 function saveLocalCache(){
-  try{localStorage.setItem(SK,JSON.stringify({version:2,cats:cats,orders:orders}));}
+  try{localStorage.setItem(SK,JSON.stringify({version:4,catalogVersion:loadedCatalogVersion||CATALOG_PATCH_VERSION,cats:cats,orders:orders,catalogTombstones:catalogTombstones,categoryTombstones:categoryTombstones}));}
   catch(e){/* localStorage full */}
 }
-function getAppState(){return{version:2,cats:cats,orders:orders,clientUpdatedAt:Date.now()};}
-window.getAppState=getAppState;
+function getAppState(){return{version:4,catalogVersion:loadedCatalogVersion||CATALOG_PATCH_VERSION,cats:cats,orders:orders,catalogTombstones:catalogTombstones,categoryTombstones:categoryTombstones,clientUpdatedAt:Date.now()};}
+window.getAppState=getAppState;window.persistAppState=save;
 function save(){
   saveLocalCache();
   if(!window.__applyingRemote && typeof window.firebaseQueueStateSync==='function'){
@@ -1288,11 +1541,14 @@ function load(){
     if(raw){
       var d=JSON.parse(raw);
       if(Array.isArray(d) && d.length){
-        cats=normalizeCatsData(d); orders=[]; return;
+        cats=normalizeCatsData(d); orders=[]; catalogTombstones=[]; categoryTombstones=[]; loadedCatalogVersion=0; return;
       }
       if(d && Array.isArray(d.cats) && d.cats.length){
         cats=normalizeCatsData(d.cats);
         orders=Array.isArray(d.orders)?d.orders:[];
+        catalogTombstones=Array.isArray(d.catalogTombstones)?d.catalogTombstones:[];
+        categoryTombstones=Array.isArray(d.categoryTombstones)?d.categoryTombstones:[];
+        loadedCatalogVersion=Number(d.catalogVersion||0);
         return;
       }
     }
@@ -1300,26 +1556,45 @@ function load(){
   // 2. Embedded data from this standalone HTML.
   if(EMBEDDED_DATA&&Array.isArray(EMBEDDED_DATA)&&EMBEDDED_DATA.length){
     cats=normalizeCatsData(JSON.parse(JSON.stringify(EMBEDDED_DATA)));
-    orders=[];
+    orders=[]; catalogTombstones=[]; categoryTombstones=[];
+    loadedCatalogVersion=CATALOG_PATCH_VERSION;
     saveLocalCache();
     return;
   }
   // 3. Defaults.
   initCats();
-  orders=[];
+  orders=[]; catalogTombstones=[]; categoryTombstones=[];
+  loadedCatalogVersion=CATALOG_PATCH_VERSION;
 }
 window.applyFirebaseState=function(remote){
   if(!remote || !Array.isArray(remote.cats) || !remote.cats.length)return;
+  var catalogChanged=false;
   window.__applyingRemote=true;
   try{
     cats=normalizeCatsData(remote.cats);
     orders=Array.isArray(remote.orders)?remote.orders:[];
-    if(!activeId || !cats.some(function(c){return c.id===activeId;}))activeId=cats[0].id;
+    catalogTombstones=Array.isArray(remote.catalogTombstones)?remote.catalogTombstones:[];
+    categoryTombstones=Array.isArray(remote.categoryTombstones)?remote.categoryTombstones:[];
+    loadedCatalogVersion=Number(remote.catalogVersion||0);
+    catalogChanged=applyCatalogPatch20260807(loadedCatalogVersion);
+    catalogChanged=mergeMasterCatalog()||catalogChanged;
+    catalogChanged=cleanupDuplicateProducts()||catalogChanged;
+    if(!activeId || !cats.some(function(c){return c.id===activeId;})){
+      try{
+        var rememberedCat=localStorage.getItem('thassosImperialActiveCategory');
+        activeId=(rememberedCat&&cats.some(function(c){return c.id===rememberedCat;}))?rememberedCat:cats[0].id;
+      }catch(e){activeId=cats[0].id;}
+    }
     saveLocalCache();
     try{refreshAll();}catch(e){console.error(e);}
     if(q('ordersModal')&&q('ordersModal').classList.contains('open'))renderOrdersList();
   }finally{
     window.__applyingRemote=false;
+  }
+  // Αν το Firebase είχε παλιότερο/μικρότερο κατάλογο, γράψε πίσω μόνο τις
+  // προσθήκες/μετονομασίες που χρειάστηκαν, χωρίς να πειράξεις τα υπόλοιπα.
+  if(catalogChanged && typeof window.firebaseQueueStateSync==='function'){
+    setTimeout(function(){window.firebaseQueueStateSync(getAppState());},80);
   }
 };
 
@@ -1348,70 +1623,112 @@ window.saveToFile=function(){
 load();
 // If no categories were loaded, initialize them from DEF
 if(!cats.length) initCats();
-// Merge any missing products (from the extended default lists) into
-// the loaded categories. This runs once on load and preserves existing
-// photos and quantities.
-mergeMissing();
-// Persist merged data back to localStorage to avoid re-merging on every refresh
+// Πέρασε πρώτα την έκδοση καταλόγου με τα 20 νέα προϊόντα και μετά κάνε γενική συγχώνευση.
+applyCatalogPatch20260807(loadedCatalogVersion);
+mergeMasterCatalog();
+cleanupDuplicateProducts();
+// Persist merged data back to localStorage/Firebase.
 save();
-activeId=cats[0].id;
+try{
+  var rememberedCat=localStorage.getItem('thassosImperialActiveCategory');
+  activeId=(rememberedCat&&cats.some(function(c){return c.id===rememberedCat;}))?rememberedCat:cats[0].id;
+}catch(e){activeId=cats[0].id;}
 
-/* ── Photo ── */
+/* ── Photo: Firebase Storage + offline fallback ── */
 function compressImg(file,cb){
   var r=new FileReader();
   r.onload=function(e){
     var img=new Image();
     img.onload=function(){
-      var MAX=400,w=img.width,h=img.height;
+      var MAX=900,w=img.width,h=img.height;
       if(w>h){if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}}
       else{if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}}
       var cv=document.createElement('canvas');
       cv.width=w;cv.height=h;
       cv.getContext('2d').drawImage(img,0,0,w,h);
-      cb(cv.toDataURL('image/jpeg',0.75));
+      cv.toBlob(function(blob){cb(blob||file);},'image/jpeg',0.78);
     };
+    img.onerror=function(){cb(file);};
     img.src=e.target.result;
   };
   r.readAsDataURL(file);
 }
+function blobToDataURL(blob,cb){var r=new FileReader();r.onload=function(){cb(r.result);};r.readAsDataURL(blob);}
+function setPhotoBusy(cid,pid,busy){
+  var c=cats.find(function(x){return x.id===cid;});if(!c)return;
+  var idx=c.products.findIndex(function(p){return p.id===pid;});
+  var el=idx>=0?q('pr_'+idx):null;if(el)el.classList.toggle('photo-uploading',!!busy);
+}
+function clearStoredPhoto(p){
+  var oldPath=p&&p.imgPath?p.imgPath:'';
+  if(p){p.img='';p.imgPath='';}
+  if(oldPath&&typeof window.firebaseDeleteImagePath==='function')window.firebaseDeleteImagePath(oldPath);
+}
+function setExternalPhoto(p,url){
+  var oldPath=p.imgPath||'';
+  p.img=url;p.imgPath='';
+  if(oldPath&&typeof window.firebaseDeleteImagePath==='function')window.firebaseDeleteImagePath(oldPath);
+}
+function uploadPhotoForProduct(file,ctx){
+  var c=cats.find(function(x){return x.id===ctx.cid;});
+  var p=c&&c.products.find(function(x){return x.name===ctx.pname;});
+  if(!p)return;
+  if(!p.id)p.id=stableProductId(c.id,p.name);
+  setPhotoBusy(c.id,p.id,true);showToast('📤 Ανέβασμα φωτογραφίας…');
+  compressImg(file,function(blob){
+    if(typeof window.firebaseUploadProductPhoto==='function'){
+      window.firebaseUploadProductPhoto(blob,c.id,p.id,p.imgPath||'').then(function(res){
+        p.img=res.url;p.imgPath=res.path;save();
+        if(q('imgOv').classList.contains('open'))q('ovImg').src=p.img;
+        renderProducts(q('search').value);renderStats();showToast('✅ Η φωτογραφία αποθηκεύτηκε online');
+      }).catch(function(err){
+        console.error(err);
+        blobToDataURL(blob,function(b64){p.img=b64;p.imgPath='';save();renderProducts(q('search').value);renderStats();showToast('⚠️ Προσωρινά τοπικά · έλεγξε Firebase Storage');});
+      }).finally(function(){setPhotoBusy(c.id,p.id,false);});
+    }else{
+      blobToDataURL(blob,function(b64){p.img=b64;p.imgPath='';save();renderProducts(q('search').value);renderStats();setPhotoBusy(c.id,p.id,false);showToast('🟠 Φωτογραφία τοπικά · θα μεταφερθεί όταν συνδεθεί Storage');});
+    }
+  });
+}
 q('fileInp').addEventListener('change',function(){
   if(!this.files||!this.files[0])return;
-  var file=this.files[0];
-  var ctx=pendPhoto||ovCtx;
+  var file=this.files[0];var ctx=pendPhoto||ovCtx;
   if(!ctx){this.value='';return;}
-  compressImg(file,function(b64){
-    var c=cats.find(function(x){return x.id===ctx.cid;});
-    var p=c&&c.products.find(function(x){return x.name===ctx.pname;});
-    if(p){
-      p.img=b64;save();
-      if(q('imgOv').classList.contains('open'))q('ovImg').src=b64;
-      renderProducts(q('search').value);
-      renderStats();
-    }
-    pendPhoto=null;
-  });
-  this.value='';
+  uploadPhotoForProduct(file,ctx);pendPhoto=null;this.value='';
 });
 
 function triggerPhoto(cid, pname){
-  var choice = confirm("Πατήστε 'ΟΚ' για να βάλετε εικόνα μέσω ΛΙΝΚ (URL).\nΠατήστε 'Ακύρωση' για να ανεβάσετε από τη συσκευή σας.");
+  var choice = confirm("Πατήστε 'ΟΚ' για εικόνα μέσω LINK.\nΠατήστε 'Ακύρωση' για φωτογραφία/εικόνα από τη συσκευή.");
   if(choice){
     var url = prompt("Επικολλήστε το Link (URL) της εικόνας:");
     if(url && url.trim() !== ""){
       var c = cats.find(function(x){return x.id === cid;});
       var p = c && c.products.find(function(x){return x.name === pname;});
-      if(p){ 
-        p.img = url.trim(); 
-        save(); 
-        renderProducts(q('search').value); 
-        renderStats(); 
-      }
+      if(p){setExternalPhoto(p,url.trim());save();renderProducts(q('search').value);renderStats();showToast('✅ Αποθηκεύτηκε το link');}
     }
-  } else {
-    pendPhoto = {cid: cid, pname: pname}; 
-    q('fileInp').click();
-  }
+  } else {pendPhoto = {cid: cid, pname: pname};q('fileInp').click();}
 }
+
+window.migrateLegacyBase64Photos=async function(){
+  if(window.__photoMigrationRunning||typeof window.firebaseUploadProductPhoto!=='function'||!window.__simpleAccessGranted)return;
+  var legacy=[];
+  cats.forEach(function(c){c.products.forEach(function(p){if(p.img&&String(p.img).indexOf('data:image/')===0)legacy.push({c:c,p:p});});});
+  if(!legacy.length)return;
+  window.__photoMigrationRunning=true;showToast('☁️ Μεταφορά παλιών φωτογραφιών…');
+  var done=0;
+  try{
+    for(var i=0;i<legacy.length;i++){
+      var item=legacy[i],p=item.p,c=item.c;
+      if(!p.id)p.id=stableProductId(c.id,p.name);
+      try{
+        var blob=await (await fetch(p.img)).blob();
+        var res=await window.firebaseUploadProductPhoto(blob,c.id,p.id,p.imgPath||'');
+        p.img=res.url;p.imgPath=res.path;done++;save();
+      }catch(err){console.error('Photo migration failed',p.name,err);}
+    }
+    if(done)showToast('✅ Μεταφέρθηκαν '+done+' φωτογραφίες στο Storage');
+  }finally{window.__photoMigrationRunning=false;}
+};
 
 /* ── Overlay ── */
 window.openImgOv=function(cid,pname){
@@ -1433,7 +1750,7 @@ window.ovChangePhoto = function(){
       var c = cats.find(function(x){return x.id === ovCtx.cid;});
       var p = c && c.products.find(function(x){return x.name === ovCtx.pname;});
       if(p){ 
-        p.img = url.trim(); 
+        setExternalPhoto(p,url.trim());
         save(); 
         q('ovImg').src = p.img; 
         renderProducts(q('search').value); 
@@ -1449,14 +1766,14 @@ window.ovRemove=function(){
   if(!ovCtx)return;
   var c=cats.find(function(x){return x.id===ovCtx.cid;});
   var p=c&&c.products.find(function(x){return x.name===ovCtx.pname;});
-  if(p){p.img='';save();}
+  if(p){clearStoredPhoto(p);save();}
   q('imgOv').classList.remove('open');ovCtx=null;
   renderProducts(q('search').value);renderStats();
 };
 window.removePhoto=function(cid,pname){
   var c=cats.find(function(x){return x.id===cid;});
   var p=c&&c.products.find(function(x){return x.name===pname;});
-  if(p){p.img='';save();renderProducts(q('search').value);renderStats();}
+  if(p){clearStoredPhoto(p);save();renderProducts(q('search').value);renderStats();showToast('🗑️ Η φωτογραφία αφαιρέθηκε');}
 };
 
 /* ── Helpers ── */
@@ -1517,7 +1834,7 @@ function dupMap(){
   var m={};
   cats.forEach(function(c){
     c.products.forEach(function(p){
-      var k=normalizeText(p.name);
+      var k=productIdentityKey(p);
       if(!m[k])m[k]=[];
       m[k].push({cid:c.id,cname:c.name,p:p});
     });
@@ -1582,7 +1899,7 @@ function renderProducts(ft){
     var sc=c.id.replace(/'/g,"\\'");
     var sn=p.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
     // use normalized key for duplicate lookup
-    var key=normalizeText(p.name), dups=dm[key];
+    var key=productIdentityKey(p), dups=dm[key];
     var isDup=false,ocats=[],qaAlert=false;
     if(dups){var oth=dups.filter(function(e){return e.cid!==c.id;});if(oth.length){isDup=true;ocats=oth.map(function(e){return e.cname;});if((p.boxes>0||p.sv>0)&&oth.some(function(e){return e.p.boxes>0||e.p.sv>0;}))qaAlert=true;}}
     var hq=p.boxes>0||p.sv>0;
@@ -1614,7 +1931,7 @@ function renderProducts(ft){
   el.innerHTML=html;
 }
 
-function switchCat(id){activeId=id;filterQty=false;filterFav=false;if(q('filterBtn'))q('filterBtn').classList.remove('active');if(q('favBtn'))q('favBtn').classList.remove('active');renderTabs();renderContent();q('search').value='';renderProducts('');renderStats();}
+function switchCat(id){activeId=id;try{localStorage.setItem('thassosImperialActiveCategory',id);}catch(e){}filterQty=false;filterFav=false;if(q('filterBtn'))q('filterBtn').classList.remove('active');if(q('favBtn'))q('favBtn').classList.remove('active');renderTabs();renderContent();q('search').value='';renderProducts('');renderStats();}
 function refreshAll(){renderTabs();renderContent();renderProducts(q('search').value);renderStats();}
 window.filterTab=function(){renderProducts(q('search').value);};
 window.toggleFilter=function(){filterQty=!filterQty;if(q('filterBtn'))q('filterBtn').classList.toggle('active',filterQty);renderProducts(q('search').value);};
@@ -1656,8 +1973,8 @@ window.clearCatQty=function(){
 window.delProduct=function(cid,idx){
   var c=cats.find(function(x){return x.id===cid;});var p=c.products[idx];
   if(!confirm('Διαγραφή "'+p.name+'";'))return;
-  c.deleted.push({name:p.name,su:p.su});c.products.splice(idx,1);
-  save();refreshAll();
+  c.deleted.push(Object.assign({},p,{deletedAt:Date.now()}));c.products.splice(idx,1);
+  save();refreshAll();showToast('🗑️ Μεταφέρθηκε στα Διαγραμμένα');
 };
 
 /* ── Reorder products ── */
@@ -1675,39 +1992,62 @@ window.moveProd=function(cid,idx,dir){
   refreshAll();
 };
 window.openAddModal=function(){
-  q('newName').value='';q('newName').style.borderColor='';q('dupWarn').textContent='';
+  q('newName').value='';q('newName').style.borderColor='';q('dupWarn').textContent='';q('dupWarn').style.color='';
+  if(q('newUnit'))q('newUnit').value='pieces';
   openMod('addModal');setTimeout(function(){q('newName').focus();},100);
 };
 window.checkDup=function(){
-  var name=normalizeText(q('newName').value);
+  var name=duplicateNameKey(q('newName').value);
+  var unit=(q('newUnit')&&q('newUnit').value)||'pieces';
   var w=q('dupWarn');
   if(!name){q('newName').style.borderColor='';w.textContent='';return;}
+  var current=cats.find(function(c){return c.id===activeId;});
+  var sameUnit=current&&current.products.find(function(p){
+    return duplicateNameKey(p.name)===name && productUnitKey(p)===unit;
+  });
+  if(sameUnit){
+    q('newName').style.borderColor='red';w.style.color='#b91c1c';
+    w.textContent='⚠️ Υπάρχει ήδη στην ίδια κατηγορία ως '+unitLabel(unit)+'.';
+    return;
+  }
+  var otherUnit=current&&current.products.find(function(p){
+    return duplicateNameKey(p.name)===name && productUnitKey(p)!==unit;
+  });
+  if(otherUnit){
+    q('newName').style.borderColor='#d97706';w.style.color='#92400e';
+    w.textContent='ℹ️ Υπάρχει με άλλη μονάδα ('+unitLabel(productUnitKey(otherUnit))+'). Επιτρέπεται.';
+    return;
+  }
   var dup=cats.find(function(c){
-    return c.id!==activeId && c.products.some(function(p){return normalizeText(p.name)===name;});
+    return c.id!==activeId && c.products.some(function(p){
+      return duplicateNameKey(p.name)===name && productUnitKey(p)===unit;
+    });
   });
   if(dup){
-    q('newName').style.borderColor='red';
-    w.textContent='⚠️ Υπάρχει στην: '+dup.name;
+    q('newName').style.borderColor='#d97706';w.style.color='#92400e';
+    w.textContent='⚠️ Υπάρχει επίσης στην: '+dup.name;
   } else {
-    q('newName').style.borderColor='';
-    w.textContent='';
+    q('newName').style.borderColor='';w.style.color='';w.textContent='';
   }
 };
 window.addProduct=function(){
   var name=q('newName').value.trim();
   if(!name){alert('Δώστε όνομα');return;}
+  var unit=(q('newUnit')&&q('newUnit').value)||'pieces';
   var c=cats.find(function(x){return x.id===activeId;});
-  var nmNorm=normalizeText(name);
-  if(c.products.some(function(p){return normalizeText(p.name)===nmNorm;})){
-    alert('Υπάρχει ήδη');
+  var nmNorm=duplicateNameKey(name);
+  if(c.products.some(function(p){return duplicateNameKey(p.name)===nmNorm && productUnitKey(p)===unit;})){
+    alert('Υπάρχει ήδη με την ίδια μονάδα ('+unitLabel(unit)+').');
     return;
   }
-  c.products.push(mkP(name));
+  var np=mkP(name);np.su=unit;c.products.push(np);
+  clearProductTombstone(c.name,np); // αν το ξαναπρόσθεσες εσύ, επιτρέπεται κανονικά
   q('newName').value='';
   q('dupWarn').textContent='';
   closeMod('addModal');
   save();
   refreshAll();
+  showToast('✅ Προστέθηκε: '+name+' · '+unitLabel(unit));
 };
 window.openEditModal=function(cid,idx){
   var c=cats.find(function(x){return x.id===cid;});
@@ -1719,12 +2059,17 @@ window.saveEdit=function(){
   var newName=q('editName').value.trim();
   if(!newName){alert('Κενό');return;}
   var c=cats.find(function(x){return x.id===pendEdit.cid;});
-  var nmNorm=normalizeText(newName);
-  if(c.products.some(function(p,i){return i!==pendEdit.idx && normalizeText(p.name)===nmNorm;})){
-    alert('Υπάρχει ήδη');
+  var nmNorm=duplicateNameKey(newName);
+  var currentUnit=productUnitKey(c.products[pendEdit.idx]);
+  if(c.products.some(function(p,i){return i!==pendEdit.idx && duplicateNameKey(p.name)===nmNorm && productUnitKey(p)===currentUnit;})){
+    alert('Υπάρχει ήδη με την ίδια μονάδα ('+unitLabel(currentUnit)+').');
     return;
   }
-  c.products[pendEdit.idx].name=newName;
+  var editedProduct=c.products[pendEdit.idx];
+  var oldSnapshot={name:editedProduct.name,su:editedProduct.su||'pieces'};
+  if(duplicateNameKey(oldSnapshot.name)!==duplicateNameKey(newName))addProductTombstone(c.name,oldSnapshot);
+  editedProduct.name=newName;
+  clearProductTombstone(c.name,editedProduct);
   save();
   closeMod('editModal');
   pendEdit=null;
@@ -1734,7 +2079,18 @@ window.openUnitModal=function(cid,idx){pendUnit={cid:cid,idx:idx};openMod('unitM
 document.querySelectorAll('.unit-opt').forEach(function(opt){
   opt.addEventListener('click',function(){
     if(!pendUnit)return;
-    cats.find(function(x){return x.id===pendUnit.cid;}).products[pendUnit.idx].su=this.dataset.unit;
+    var c=cats.find(function(x){return x.id===pendUnit.cid;});
+    var p=c&&c.products[pendUnit.idx];if(!p)return;
+    var newUnit=this.dataset.unit;
+    var sameName=duplicateNameKey(p.name);
+    if(c.products.some(function(x,i){return i!==pendUnit.idx && duplicateNameKey(x.name)===sameName && productUnitKey(x)===newUnit;})){
+      alert('Υπάρχει ήδη το ίδιο προϊόν ως '+unitLabel(newUnit)+'.');
+      return;
+    }
+    var oldUnitSnapshot={name:p.name,su:p.su||'pieces'};
+    if(productUnitKey(oldUnitSnapshot)!==newUnit)addProductTombstone(c.name,oldUnitSnapshot);
+    p.su=newUnit;
+    clearProductTombstone(c.name,p);
     closeMod('unitModal');pendUnit=null;save();refreshAll();
   });
 });
@@ -1807,17 +2163,22 @@ function renderCatList(){
       +'<button onclick="delCat(\''+c.id+'\')" '+(cats.length<=1?'disabled':'')+'>🗑️</button></div></div>';
   }).join('')||'<div style="padding:10px;text-align:center">Καμία</div>';
 }
-window.renCat=function(id){var c=cats.find(function(x){return x.id===id;});var n=prompt('Νέο όνομα:',c.name);if(n&&n.trim()){c.name=n.trim();save();refreshAll();renderCatList();}};
+window.renCat=function(id){var c=cats.find(function(x){return x.id===id;});var n=prompt('Νέο όνομα:',c.name);if(n&&n.trim()){var oldName=c.name;var newName=n.trim();if(categoryIdentityKey(oldName)!==categoryIdentityKey(newName))addCategoryTombstone(oldName);c.name=newName;clearCategoryTombstone(newName);save();refreshAll();renderCatList();}};
 window.delCat=function(id){
   if(cats.length<=1){alert('Τουλάχιστον μία κατηγορία.');return;}
   if(!confirm('Διαγραφή κατηγορίας;'))return;
+  var old=cats.find(function(c){return c.id===id;});
+  if(old)addCategoryTombstone(old.name);
+  if(old&&typeof window.firebaseDeleteImagePath==='function'){(old.products||[]).concat(old.deleted||[]).forEach(function(p){if(p.imgPath)window.firebaseDeleteImagePath(p.imgPath);});}
   cats=cats.filter(function(c){return c.id!==id;});
   if(activeId===id)activeId=cats[0].id;
+  try{localStorage.setItem('thassosImperialActiveCategory',activeId);}catch(e){}
   save();refreshAll();renderCatList();
 };
 window.addCategory=function(){
   var name=q('newCatName').value.trim();if(!name){alert('Δώστε όνομα');return;}
   cats.push({id:'c'+Date.now(),name:name,products:[],deleted:[]});
+  clearCategoryTombstone(name);
   q('newCatName').value='';save();refreshAll();renderCatList();
 };
 
@@ -1842,11 +2203,15 @@ window.showDeletedModal=function(){
 window.restoreProd=function(cid,i){
   var c=cats.find(function(x){return x.id===cid;});var item=c.deleted[i];
   if(c.products.find(function(p){return p.name===item.name;})){alert('Υπάρχει ήδη.');return;}
-  var p=mkP(item.name);p.su=item.su;
-  c.products.push(p);c.deleted.splice(i,1);save();refreshAll();showDeletedModal();
+  var p=Object.assign(mkP(item.name),item);delete p.deletedAt;
+  c.products.push(p);c.deleted.splice(i,1);clearProductTombstone(c.name,p);save();refreshAll();showDeletedModal();showToast('↩️ Επαναφέρθηκε μαζί με τα στοιχεία του');
 };
 window.permDel=function(cid,i){
-  if(confirm('Οριστική διαγραφή;')){cats.find(function(x){return x.id===cid;}).deleted.splice(i,1);save();showDeletedModal();}
+  if(!confirm('Οριστική διαγραφή;'))return;
+  var c=cats.find(function(x){return x.id===cid;});var item=c&&c.deleted[i];
+  if(c&&item)addProductTombstone(c.name,item);
+  if(item&&item.imgPath&&typeof window.firebaseDeleteImagePath==='function')window.firebaseDeleteImagePath(item.imgPath);
+  if(c)c.deleted.splice(i,1);save();showDeletedModal();
 };
 
 
@@ -1869,6 +2234,7 @@ try{refreshAll();}catch(e){console.error(e);}
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js';
 import { getDatabase, ref, onValue, set, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js';
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-storage.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyA0z_QL3rq5uI0H5TF5INWLQ3MsW-leO0c",
@@ -1887,6 +2253,7 @@ const SESSION_KEY = 'thassosImperialAccess';
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const storage = getStorage(app);
 const stateRef = ref(db, ROOT_PATH);
 const connectedRef = ref(db, '.info/connected');
 let saveTimer = null;
@@ -1904,6 +2271,19 @@ const cloudUser = document.getElementById('cloudUser');
 
 function setStatus(text){ if(cloudStatus) cloudStatus.textContent = text; }
 function showGate(show){ if(gate) gate.classList.toggle('hidden', !show); }
+function cleanStoragePart(v){return String(v||'x').replace(/[^a-zA-Z0-9_-]/g,'_').slice(0,120)||'x';}
+window.firebaseUploadProductPhoto = async function(blob,categoryId,productId){
+  if(!window.__simpleAccessGranted) throw new Error('LOCKED');
+  const path='thassosImperial/products/'+cleanStoragePart(categoryId)+'/'+cleanStoragePart(productId)+'/photo.jpg';
+  const r=storageRef(storage,path);
+  await uploadBytes(r,blob,{contentType:'image/jpeg',cacheControl:'public,max-age=31536000'});
+  const url=await getDownloadURL(r);
+  return {url,path};
+};
+window.firebaseDeleteImagePath = async function(path){
+  if(!path||!window.__simpleAccessGranted)return;
+  try{await deleteObject(storageRef(storage,path));}catch(err){if(err&&err.code!=='storage/object-not-found')console.warn('Storage delete:',err);}
+};
 
 window.firebaseQueueStateSync = function(state){
   if(!window.__simpleAccessGranted || window.__applyingRemote) return;
@@ -1915,7 +2295,9 @@ window.firebaseQueueStateSync = function(state){
       setStatus(connected ? '🟢 Live · συγχρονισμένο' : '🟠 Offline · θα συγχρονιστεί');
     }catch(err){
       console.error(err);
+      const msg=(err && err.code === 'PERMISSION_DENIED') ? '⚠️ Το Firebase δεν επιτρέπει αποθήκευση · έλεγξε Database Rules' : '⚠️ Δεν έγινε συγχρονισμός · τα δεδομένα έμειναν τοπικά';
       setStatus(err && err.code === 'PERMISSION_DENIED' ? '🔴 Άλλαξε τους Firebase Database Rules' : '🔴 Σφάλμα συγχρονισμού');
+      if(typeof window.showToast==='function') window.showToast(msg);
     }
   }, 500);
 };
@@ -1928,12 +2310,16 @@ function startStateSync(){
       const remote = snap.val();
       if(typeof window.applyFirebaseState === 'function') window.applyFirebaseState(remote);
       setStatus(connected ? '🟢 Live · συγχρονισμένο' : '🟠 Offline · τοπικά δεδομένα');
+      setTimeout(() => window.migrateLegacyBase64Photos?.(), 1200);
     } else if(typeof window.getAppState === 'function') {
       window.firebaseQueueStateSync(window.getAppState());
+      setTimeout(() => window.migrateLegacyBase64Photos?.(), 1200);
     }
   }, (err) => {
     console.error(err);
+    const msg=(err && err.code === 'PERMISSION_DENIED') ? '⚠️ Το Firebase δεν επιτρέπει πρόσβαση · έλεγξε Database Rules' : '⚠️ Δεν μπορεί να διαβαστεί το Firebase';
     setStatus(err && err.code === 'PERMISSION_DENIED' ? '🔴 Άλλαξε τους Firebase Database Rules' : '🔴 Δεν διαβάζεται η βάση');
+    if(typeof window.showToast==='function') window.showToast(msg);
   });
 }
 
@@ -1944,6 +2330,7 @@ function unlockApp(){
   if(cloudUser) cloudUser.textContent='🔐 123456';
   setStatus(connected ? '🟢 Live · Firebase' : '🟠 Σύνδεση…');
   startStateSync();
+  setTimeout(() => window.migrateLegacyBase64Photos?.(), 2500);
 }
 
 function lockApp(){
