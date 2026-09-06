@@ -1958,7 +1958,9 @@ function renderProducts(ft){
   });
   el.innerHTML=html;
 }
+var __lastQtyBlur=0;
 window.toggleGroup=function(cid,gname){
+  if(Date.now()-__lastQtyBlur<500)return; /* αγνόησε τυχαίο πάτημα που έκλεισε το πληκτρολόγιο */
   var key=cid+'|'+gname;
   collapsedGroups[key]=!collapsedGroups[key];
   renderProducts(q('search').value);
@@ -1992,6 +1994,7 @@ window.updQty=function(cid,idx,type,val){
   var p=c.products[idx];
   var num=parseFloat(val);if(isNaN(num)||num<0)num=0;
   if(type==='b')p.boxes=Math.floor(num);else p.sv=num;
+  __lastQtyBlur=Date.now();
   save();renderTabs();renderStats();
   var pe=q('pr_'+idx);if(pe){var hq=p.boxes>0||p.sv>0;if(hq&&!pe.classList.contains('dup-warn'))pe.classList.add('has-qty');else if(!hq)pe.classList.remove('has-qty');}
   if(pe){
