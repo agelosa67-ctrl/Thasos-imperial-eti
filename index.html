@@ -1985,14 +1985,14 @@ window.chgQty=function(cid,idx,type,delta){
   var ctrl=q((type==='b'?'bc_':'sc_')+idx);
   if(ctrl){var inp=ctrl.querySelector('input');if(inp){inp.value=nv===0?'':nv;inp.classList.remove('flash-up','flash-dn');void inp.offsetWidth;inp.classList.add(delta>0?'flash-up':'flash-dn');setTimeout(function(){inp.classList.remove('flash-up','flash-dn');},400);}}
   var pe=q('pr_'+idx);if(pe){var hq=p.boxes>0||p.sv>0;if(hq&&!pe.classList.contains('dup-warn'))pe.classList.add('has-qty');else if(!hq)pe.classList.remove('has-qty');}
-  renderTabs();renderStats();renderProducts(q('search').value);
+  renderTabs();renderStats();
 };
 window.updQty=function(cid,idx,type,val){
   var c=cats.find(function(x){return x.id===cid;});if(!c)return;
   var p=c.products[idx];
   var num=parseFloat(val);if(isNaN(num)||num<0)num=0;
   if(type==='b')p.boxes=Math.floor(num);else p.sv=num;
-  save();renderTabs();renderStats();renderProducts(q('search').value);
+  save();renderTabs();renderStats();
   var pe=q('pr_'+idx);if(pe){var hq=p.boxes>0||p.sv>0;if(hq&&!pe.classList.contains('dup-warn'))pe.classList.add('has-qty');else if(!hq)pe.classList.remove('has-qty');}
 };
 window.clearCatQty=function(){
