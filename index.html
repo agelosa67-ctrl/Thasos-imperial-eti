@@ -1992,8 +1992,12 @@ window.updQty=function(cid,idx,type,val){
   var p=c.products[idx];
   var num=parseFloat(val);if(isNaN(num)||num<0)num=0;
   if(type==='b')p.boxes=Math.floor(num);else p.sv=num;
+  var scrollY=window.scrollY;
   save();renderTabs();renderStats();
   var pe=q('pr_'+idx);if(pe){var hq=p.boxes>0||p.sv>0;if(hq&&!pe.classList.contains('dup-warn'))pe.classList.add('has-qty');else if(!hq)pe.classList.remove('has-qty');}
+  requestAnimationFrame(function(){window.scrollTo(0,scrollY);});
+  setTimeout(function(){window.scrollTo(0,scrollY);},50);
+  setTimeout(function(){window.scrollTo(0,scrollY);},250);
 };
 window.clearCatQty=function(){
   var c=cats.find(function(x){return x.id===activeId;});if(!c)return;
